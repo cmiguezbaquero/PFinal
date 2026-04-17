@@ -1,0 +1,61 @@
+package com.workoutplanner.backend.service;
+
+import com.workoutplanner.backend.model.Exercise;
+import com.workoutplanner.backend.model.Workout;
+import com.workoutplanner.backend.model.WorkoutExercise;
+import com.workoutplanner.backend.repository.ExerciseRepository;
+import com.workoutplanner.backend.repository.WorkoutRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class RecommendationService {
+
+    private final WorkoutRepository workoutRepository;
+    private final ExerciseRepository exerciseRepository;
+
+    public RecommendationService(WorkoutRepository workoutRepository,
+                                 ExerciseRepository exerciseRepository) {
+        this.workoutRepository = workoutRepository;
+        this.exerciseRepository = exerciseRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Exercise> recommendForUser(Long userId) {
+        List<Workout> workouts = workoutRepository.findByUserId(userId);
+        List<Exercise> allExercises = exerciseRepository.findAll();
+
+        if (allExercises.isEmpty()) {
+            return List.of();
+        }
+
+        if (workouts.isEmpty()) {
+            return allExercises.stream()
+                    .sorted(Comparator.comparing(Exercise::getName, String.CASE_INSENSITIVE_ORDER))
+                    .toList();
+        }
+
+        Map<String, Integer> muscleGroupUsage = new HashMap<>();
+        for (Workout workout : workouts) {
+            for (WorkoutExercise workoutExercise : workout.getExercises()) {
+                Exercise exercise = workoutExercise.getExercise();
+                if (exercise != null && exercise.getMuscleGroup() != null) {
+                    muscleGroupUsage.merge(exercise.getMuscleGroup().toLowerCase(), 1, Integer::sum);
+                }
+            }
+        }
+
+        return allExercises.stream()
+                .sorted(Comparator
+                        .comparingInt((Exercise exercise) -> muscleGroupUsage.getOrDefault(
+                                exercise.getMuscleGroup() == null ? "" : exercise.getMuscleGroup().toLowerCase(), 0))
+                        .thenComparing(Exercise::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+}
+
