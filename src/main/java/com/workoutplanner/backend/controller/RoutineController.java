@@ -1,5 +1,6 @@
 package com.workoutplanner.backend.controller;
 
+import com.workoutplanner.backend.dto.WeeklyGenerationRequest;
 import com.workoutplanner.backend.model.Routine;
 import com.workoutplanner.backend.service.RoutineService;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +28,19 @@ public class RoutineController {
         return service.getById(id);
     }
 
+    @GetMapping("/user/{userId}")
+    public List<Routine> getByUserId(@PathVariable Long userId) {
+        return service.getByUserId(userId);
+    }
+
     @PostMapping
     public Routine create(@RequestBody Routine routine) {
         return service.create(routine);
+    }
+
+    @PostMapping("/weekly/generate")
+    public Routine generateWeeklyPlan(@RequestBody WeeklyGenerationRequest request) {
+        return service.generateWeeklyPlan(request.getUserId(), request.getWeekStart());
     }
 
     @PutMapping("/{id}")

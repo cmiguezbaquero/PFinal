@@ -22,6 +22,11 @@ public class ExerciseController {
         return exerciseService.getAll();
     }
 
+    @GetMapping("/available/{userId}")
+    public List<Exercise> getAvailableForUser(@PathVariable Long userId) {
+        return exerciseService.getVisibleForUser(userId);
+    }
+
     @GetMapping("/{id}")
     public Exercise getById(@PathVariable Long id) {
         return exerciseService.getById(id);

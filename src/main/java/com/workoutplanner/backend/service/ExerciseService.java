@@ -22,12 +22,19 @@ public class ExerciseService {
         return exerciseRepository.findAll();
     }
 
+    public List<Exercise> getVisibleForUser(Long userId) {
+        return exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId);
+    }
+
     public Exercise getById(Long id) {
         return exerciseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Exercise not found"));
     }
 
     public Exercise create(Exercise exercise) {
+        if (exercise.getOwnerId() == null) {
+            exercise.setShared(true);
+        }
         return exerciseRepository.save(exercise);
     }
 
@@ -36,6 +43,8 @@ public class ExerciseService {
         existing.setName(exercise.getName());
         existing.setMuscleGroup(exercise.getMuscleGroup());
         existing.setDescription(exercise.getDescription());
+        existing.setOwnerId(exercise.getOwnerId());
+        existing.setShared(exercise.isShared());
         return exerciseRepository.save(existing);
     }
 

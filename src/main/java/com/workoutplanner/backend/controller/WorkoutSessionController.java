@@ -1,9 +1,11 @@
 package com.workoutplanner.backend.controller;
 
+import com.workoutplanner.backend.dto.WeeklyComplianceResponse;
 import com.workoutplanner.backend.model.WorkoutSession;
 import com.workoutplanner.backend.service.WorkoutSessionService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -34,6 +36,12 @@ public class WorkoutSessionController {
     @GetMapping("/user/{userId}")
     public List<WorkoutSession> getByUserId(@PathVariable Long userId) {
         return workoutSessionService.getByUserId(userId);
+    }
+
+    @GetMapping("/compliance/user/{userId}/week/{weekStart}")
+    public WeeklyComplianceResponse getWeeklyCompliance(@PathVariable Long userId,
+                                                        @PathVariable LocalDate weekStart) {
+        return workoutSessionService.getWeeklyCompliance(userId, weekStart);
     }
 
     @PostMapping

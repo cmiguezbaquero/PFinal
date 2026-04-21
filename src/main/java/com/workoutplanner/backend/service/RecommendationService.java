@@ -28,7 +28,7 @@ public class RecommendationService {
     @Transactional(readOnly = true)
     public List<Exercise> recommendForUser(Long userId) {
         List<Workout> workouts = workoutRepository.findByUserId(userId);
-        List<Exercise> allExercises = exerciseRepository.findAll();
+        List<Exercise> allExercises = exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId);
 
         if (allExercises.isEmpty()) {
             return List.of();

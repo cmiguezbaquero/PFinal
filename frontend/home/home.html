@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Gym - Home</title>
+  <link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+
+<header class="header">
+  <h1>Cyber Gym</h1>
+  <p>Training Dashboard</p>
+</header>
+
+<nav class="nav">
+  <a href="./home.html">Home</a>
+  <a href="../users/users.html">Users</a>
+  <a href="../exercises/exercises.html">Exercises</a>
+  <a href="../workouts/workouts.html">Workouts</a>
+  <a href="../workouts-list/workouts-list.html">Workouts List</a>
+</nav>
+
+<main class="container">
+
+  <section class="panel">
+    <h2>Overview</h2>
+    <p id="homeUser">Login from Users page to see your dashboard.</p>
+    <div class="grid">
+      <div class="card" id="activePlans">Active Plans: -</div>
+      <div class="card" id="weeklyWorkouts">Weekly Workouts: -</div>
+      <div class="card" id="complianceCard">Compliance: -</div>
+    </div>
+  </section>
+
+</main>
+
+<script src="../shared/api.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

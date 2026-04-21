@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Workout Builder</title>
+  <link rel="stylesheet" href="workouts.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>🏋️ Workout Builder</h1>
+</header>
+
+<main class="container">
+
+  <section class="panel">
+    <h2>👤 Current User</h2>
+    <p id="currentUserInfo">Login from the Users page first.</p>
+  </section>
+
+  <section class="panel">
+    <h2>🗓️ Weekly Plan</h2>
+    <input id="weekStart" type="date">
+    <button onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
+  </section>
+
+  <section class="panel">
+    <h2>💪 Available Exercises</h2>
+    <div id="exerciseList" class="grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>➕ Create Custom Exercise</h2>
+    <input id="customExerciseName" placeholder="Exercise name">
+    <input id="customExerciseMuscle" placeholder="Muscle group">
+    <input id="customExerciseDescription" placeholder="Description">
+    <label>
+      <input id="customExerciseShared" type="checkbox">
+      Share with others
+    </label>
+    <button onclick="createCustomExercise()">Create Exercise</button>
+  </section>
+
+  <section class="panel">
+    <h2>📋 Selected Exercises</h2>
+    <div id="selectedList"></div>
+  </section>
+
+  <section class="panel">
+    <h2>🚀 Create Workout</h2>
+    <input id="description" placeholder="Workout description">
+    <label>Planned date
+      <input id="plannedDate" type="date" aria-label="Planned date">
+    </label>
+    <button onclick="createWorkout()">Create Workout</button>
+  </section>
+
+</main>
+
+<script src="../shared/api.js"></script>
+<script src="workouts.js"></script>
+</body>
+</html>

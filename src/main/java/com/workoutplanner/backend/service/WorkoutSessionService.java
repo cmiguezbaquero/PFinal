@@ -1,5 +1,6 @@
 package com.workoutplanner.backend.service;
 
+import com.workoutplanner.backend.dto.WeeklyComplianceResponse;
 import com.workoutplanner.backend.model.Workout;
 import com.workoutplanner.backend.model.WorkoutSession;
 import com.workoutplanner.backend.repository.WorkoutRepository;
@@ -7,6 +8,7 @@ import com.workoutplanner.backend.repository.WorkoutSessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -61,6 +63,17 @@ public class WorkoutSessionService {
     public void delete(Long id) {
         WorkoutSession session = getById(id);
         workoutSessionRepository.delete(session);
+    }
+
+    public WeeklyComplianceResponse getWeeklyCompliance(Long userId, LocalDate weekStart) {
+        LocalDate weekEnd = weekStart.plusDays(6);
+        List<Workout> plannedWorkouts = workoutRepository.findByUserIdAndPlannedDateBetween(userId, weekStart, weekEnd);
+
+        long plannedCount = plannedWorkouts.size();
+        long completedCount = plannedWorkouts.stream().filter(Workout::isCompleted).count();
+        double percentage = plannedCount == 0 ? 0.0 : (completedCount * 100.0) / plannedCount;
+
+        return new WeeklyComplianceResponse(plannedCount, completedCount, percentage);
     }
 
     private void resolveWorkout(WorkoutSession session) {

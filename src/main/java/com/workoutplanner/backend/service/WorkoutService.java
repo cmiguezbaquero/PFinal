@@ -1,16 +1,19 @@
 package com.workoutplanner.backend.service;
 
 import com.workoutplanner.backend.model.Exercise;
+import com.workoutplanner.backend.model.Routine;
 import com.workoutplanner.backend.model.User;
 import com.workoutplanner.backend.model.Workout;
 import com.workoutplanner.backend.model.WorkoutExercise;
 import com.workoutplanner.backend.repository.ExerciseRepository;
+import com.workoutplanner.backend.repository.RoutineRepository;
 import com.workoutplanner.backend.repository.UserRepository;
 import com.workoutplanner.backend.repository.WorkoutRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +26,16 @@ public class WorkoutService {
 	private final WorkoutRepository workoutRepository;
 	private final UserRepository userRepository;
 	private final ExerciseRepository exerciseRepository;
+	private final RoutineRepository routineRepository;
 
 	public WorkoutService(WorkoutRepository workoutRepository,
 						  UserRepository userRepository,
-						  ExerciseRepository exerciseRepository) {
+						  ExerciseRepository exerciseRepository,
+						  RoutineRepository routineRepository) {
 		this.workoutRepository = workoutRepository;
 		this.userRepository = userRepository;
 		this.exerciseRepository = exerciseRepository;
+		this.routineRepository = routineRepository;
 	}
 
 	public List<Workout> getAll() {
@@ -43,6 +49,11 @@ public class WorkoutService {
 	public Workout getById(Long id) {
 		return workoutRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Workout not found"));
+	}
+
+	public List<Workout> getByUserAndWeek(Long userId, LocalDate weekStart) {
+		LocalDate end = weekStart.plusDays(6);
+		return workoutRepository.findByUserIdAndPlannedDateBetween(userId, weekStart, end);
 	}
 
 	public Workout create(Workout workout) {
@@ -61,8 +72,19 @@ public class WorkoutService {
 			existing.setUser(loadUser(workout.getUser().getId()));
 		}
 
+		if (workout.getRoutine() != null && workout.getRoutine().getId() != null) {
+			existing.setRoutine(loadRoutine(workout.getRoutine().getId()));
+		}
+
+		if (workout.getPlannedDate() != null) {
+			existing.setPlannedDate(workout.getPlannedDate());
+		}
+
+		existing.setCompleted(workout.isCompleted());
+		existing.setCompletedAt(workout.getCompletedAt());
+
 		if (workout.getExercises() != null) {
-			List<WorkoutExercise> resolvedExercises = resolveExercises(workout, workout.getExercises());
+			List<WorkoutExercise> resolvedExercises = resolveExercises(existing, workout.getExercises());
 			existing.getExercises().clear();
 			existing.getExercises().addAll(resolvedExercises);
 		}
@@ -75,9 +97,20 @@ public class WorkoutService {
 		workoutRepository.delete(workout);
 	}
 
+	public Workout markCompleted(Long id, boolean completed) {
+		Workout workout = getById(id);
+		workout.setCompleted(completed);
+		workout.setCompletedAt(completed ? LocalDate.now() : null);
+		return workoutRepository.save(workout);
+	}
+
 	private void resolveRelations(Workout workout) {
 		if (workout.getUser() != null && workout.getUser().getId() != null) {
 			workout.setUser(loadUser(workout.getUser().getId()));
+		}
+
+		if (workout.getRoutine() != null && workout.getRoutine().getId() != null) {
+			workout.setRoutine(loadRoutine(workout.getRoutine().getId()));
 		}
 
 		if (workout.getExercises() != null) {
@@ -105,5 +138,10 @@ public class WorkoutService {
 	private Exercise loadExercise(Long id) {
 		return exerciseRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Exercise not found"));
+	}
+
+	private Routine loadRoutine(Long id) {
+		return routineRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Routine not found"));
 	}
 }

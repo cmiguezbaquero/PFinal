@@ -5,7 +5,9 @@ import com.workoutplanner.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import java.util.List;
 
@@ -34,6 +36,27 @@ public class UserService {
 
     public User createUser (User user){
         return userRepository.save(user);
+    }
+
+    public User register(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Email is required");
+        }
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Password is required");
+        }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new ResponseStatusException(BAD_REQUEST, "Email already registered");
+        }
+        return userRepository.save(user);
+    }
+
+    public User login(String email, String password) {
+        User user = getUserByEmail(email);
+        if (user.getPassword() == null || !user.getPassword().equals(password)) {
+            throw new ResponseStatusException(UNAUTHORIZED, "Invalid credentials");
+        }
+        return user;
     }
 
     public User updateUser(Long id, User user) {

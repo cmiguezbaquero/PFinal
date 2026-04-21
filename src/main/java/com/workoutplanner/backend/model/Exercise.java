@@ -21,14 +21,20 @@ public class Exercise {
 
     private String description;
 
+    private Long ownerId;
+
+    private boolean shared;
+
     public Exercise() {
     }
 
-    public Exercise(Long id, String name, String muscleGroup, String description) {
+    public Exercise(Long id, String name, String muscleGroup, String description, Long ownerId, boolean shared) {
         this.id = id;
         this.name = name;
         this.muscleGroup = muscleGroup;
         this.description = description;
+        this.ownerId = ownerId;
+        this.shared = shared;
     }
 
     public Long getId() {
@@ -61,5 +67,21 @@ public class Exercise {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
     }
 }

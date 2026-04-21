@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Gym - Users</title>
+  <link rel="stylesheet" href="users.css">
+</head>
+
+<body>
+
+<header class="header">
+  <h1>Users</h1>
+</header>
+
+<nav class="nav">
+  <a href="../home/home.html">Home</a>
+  <a href="users.html">Users</a>
+</nav>
+
+<main class="container">
+
+  <section class="panel">
+    <h2>Create account</h2>
+    <div class="form">
+      <input id="registerName" placeholder="Name">
+      <input id="registerEmail" placeholder="Email">
+      <input id="registerPassword" type="password" placeholder="Password">
+      <button onclick="registerUser()">Register</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Login</h2>
+    <div class="form">
+      <input id="loginEmail" placeholder="Email">
+      <input id="loginPassword" type="password" placeholder="Password">
+      <button onclick="loginUser()">Login</button>
+      <button onclick="logoutUser()">Logout</button>
+    </div>
+    <p id="auth-status"></p>
+  </section>
+
+  <section class="panel">
+    <h2>Users (admin view)</h2>
+    <div class="form">
+      <input id="searchEmail" placeholder="Search by email">
+      <button onclick="searchUser()">Search</button>
+      <button onclick="loadUsers()">Reset</button>
+    </div>
+    <div id="users-container" class="grid"></div>
+  </section>
+
+</main>
+
+<script src="../shared/api.js"></script>
+<script src="users.js"></script>
+</body>
+</html>

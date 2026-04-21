@@ -4,6 +4,7 @@ import com.workoutplanner.backend.model.Workout;
 import com.workoutplanner.backend.service.WorkoutService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,12 @@ public class WorkoutController {
         return workoutService.getByUserId(userId);
     }
 
+    @GetMapping("/user/{userId}/week/{weekStart}")
+    public List<Workout> getByUserAndWeek(@PathVariable Long userId,
+                                          @PathVariable LocalDate weekStart) {
+        return workoutService.getByUserAndWeek(userId, weekStart);
+    }
+
     @PostMapping
     public Workout create(@RequestBody Workout workout) {
         return workoutService.create(workout);
@@ -40,6 +47,12 @@ public class WorkoutController {
     @PutMapping("/{id}")
     public Workout update(@PathVariable Long id, @RequestBody Workout workout) {
         return workoutService.update(id, workout);
+    }
+
+    @PutMapping("/{id}/completion")
+    public Workout updateCompletion(@PathVariable Long id,
+                                    @RequestParam(defaultValue = "true") boolean completed) {
+        return workoutService.markCompleted(id, completed);
     }
 
     @DeleteMapping("/{id}")
