@@ -1,3 +1,4 @@
+
 const usersAPI = API.users;
 const authAPI = API.auth;
 
@@ -69,20 +70,10 @@ async function loginUser() {
   const user = await res.json();
   setCurrentUser(user);
 
-  // 🔥 comprobar si tiene objetivos
-  const goalRes = await fetch(`${API.goals}/user/${user.id}`);
-
-  if (!goalRes.ok) {
-    window.location.href = "/goals/goals.html";
-    return;
-  }
-
-  const goal = await goalRes.json();
-
-  if (!goal) {
+  if (!user.hasGoals) {
     window.location.href = "/goals/goals.html";
   } else {
-    window.location.href = "/home/home.html";
+    window.location.href = "index.html";
   }
 }
 
@@ -94,7 +85,7 @@ async function deleteUser(id) {
 async function searchUser() {
   const email = document.getElementById("searchEmail").value;
 
-  const res = await fetch(`${usersAPI}/email/${email}`);
+  const res = await fetch(`${API_URL}/users/email/${email}`);
   if (!res.ok) {
     render([]);
     return;

@@ -9,7 +9,7 @@ public class WeeklyComplianceResponse {
     public WeeklyComplianceResponse(long planned, long completed, double percentage) {
         this.planned = planned;
         this.completed = completed;
-        this.percentage = percentage;
+        this.percentage = planned == 0 ? 0 : (completed * 100.0 / planned);;
     }
 
     public long getPlanned() {

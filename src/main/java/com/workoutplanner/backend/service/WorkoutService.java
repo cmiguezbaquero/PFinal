@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -57,11 +58,13 @@ public class WorkoutService {
 	}
 
 	public Workout create(Workout workout) {
+		validateWorkout(workout);
 		resolveRelations(workout);
 		return workoutRepository.save(workout);
 	}
 
 	public Workout update(Long id, Workout workout) {
+		validateWorkout(workout);
 		Workout existing = getById(id);
 		existing.setDescription(workout.getDescription());
 		if (workout.getCreatedAt() != null) {
@@ -121,6 +124,7 @@ public class WorkoutService {
 	private List<WorkoutExercise> resolveExercises(Workout workout, List<WorkoutExercise> exercises) {
 		List<WorkoutExercise> resolvedExercises = new ArrayList<>();
 		for (WorkoutExercise workoutExercise : exercises) {
+			validateWorkoutExercise(workoutExercise);
 			if (workoutExercise.getExercise() != null && workoutExercise.getExercise().getId() != null) {
 				workoutExercise.setExercise(loadExercise(workoutExercise.getExercise().getId()));
 			}
@@ -143,5 +147,32 @@ public class WorkoutService {
 	private Routine loadRoutine(Long id) {
 		return routineRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Routine not found"));
+	}
+
+	private void validateWorkout(Workout workout) {
+		if (workout.getUser() == null || workout.getUser().getId() == null) {
+			throw new ResponseStatusException(BAD_REQUEST, "Workout user is required");
+		}
+		if (workout.getDescription() == null || workout.getDescription().isBlank()) {
+			throw new ResponseStatusException(BAD_REQUEST, "Workout description is required");
+		}
+		if (workout.getExercises() == null || workout.getExercises().isEmpty()) {
+			throw new ResponseStatusException(BAD_REQUEST, "Workout must include at least one exercise");
+		}
+	}
+
+	private void validateWorkoutExercise(WorkoutExercise workoutExercise) {
+		if (workoutExercise.getExercise() == null || workoutExercise.getExercise().getId() == null) {
+			throw new ResponseStatusException(BAD_REQUEST, "Exercise id is required");
+		}
+		if (workoutExercise.getSets() <= 0) {
+			throw new ResponseStatusException(BAD_REQUEST, "Sets must be greater than 0");
+		}
+		if (workoutExercise.getReps() <= 0) {
+			throw new ResponseStatusException(BAD_REQUEST, "Reps must be greater than 0");
+		}
+		if (workoutExercise.getWeight() < 0) {
+			throw new ResponseStatusException(BAD_REQUEST, "Weight cannot be negative");
+		}
 	}
 }

@@ -26,6 +26,7 @@ public class AuthController {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
+
         return AuthUserResponse.from(userService.register(user));
     }
 

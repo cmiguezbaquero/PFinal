@@ -18,8 +18,8 @@ Backend Spring Boot para gestionar:
 
 El proyecto ya viene configurado para usar MariaDB con estos valores en `src/main/resources/application.properties`:
 
-- usuario: `root`
-- contraseña: `root`
+- usuario: `user`
+- contraseña: `password`
 - base de datos: `workout`
 
 Si usas `docker-compose.yml`, puedes levantar la BD con:

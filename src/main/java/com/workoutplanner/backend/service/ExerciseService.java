@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -32,6 +33,7 @@ public class ExerciseService {
     }
 
     public Exercise create(Exercise exercise) {
+        validateExercise(exercise);
         if (exercise.getOwnerId() == null) {
             exercise.setShared(true);
         }
@@ -39,6 +41,7 @@ public class ExerciseService {
     }
 
     public Exercise update(Long id, Exercise exercise) {
+        validateExercise(exercise);
         Exercise existing = getById(id);
         existing.setName(exercise.getName());
         existing.setMuscleGroup(exercise.getMuscleGroup());
@@ -51,6 +54,21 @@ public class ExerciseService {
     public void delete(Long id) {
         Exercise exercise = getById(id);
         exerciseRepository.delete(exercise);
+    }
+
+    private void validateExercise(Exercise exercise) {
+        if (exercise.getName() == null || exercise.getName().isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Exercise name is required");
+        }
+        if (exercise.getMuscleGroup() == null || exercise.getMuscleGroup().isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Muscle group is required");
+        }
+        if (exercise.getDescription() == null || exercise.getDescription().isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Description is required");
+        }
+        if (exercise.getOwnerId() == null && !exercise.isShared()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Global exercises must be shared");
+        }
     }
 }
 

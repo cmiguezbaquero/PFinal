@@ -24,7 +24,8 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     container_name: workout-frontend
     ports:
       - "3000:80"

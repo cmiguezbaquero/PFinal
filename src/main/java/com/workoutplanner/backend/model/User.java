@@ -2,6 +2,8 @@ package com.workoutplanner.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.workoutplanner.backend.enums.GoalType;
+import com.workoutplanner.backend.enums.Level;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -23,6 +25,17 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    private boolean hasGoals = false;
+
+    private int trainingDaysPerWeek;
+
+
+    @Enumerated(EnumType.STRING)
+    private GoalType goalType;
+
+    @Enumerated(EnumType.STRING)
+    private Level level;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Workout> workouts = new ArrayList<>();
@@ -36,6 +49,39 @@ public class User {
         this.email = email;
         this.password = password;
         this.workouts = workouts;
+    }
+
+    public boolean isHasGoals() {
+        return hasGoals;
+    }
+
+    public void setHasGoals(boolean hasGoals) {
+        this.hasGoals = hasGoals;
+    }
+
+
+    public int getTrainingDaysPerWeek() {
+        return trainingDaysPerWeek;
+    }
+
+    public void setTrainingDaysPerWeek(int trainingDaysPerWeek) {
+        this.trainingDaysPerWeek = trainingDaysPerWeek;
+    }
+
+    public GoalType getGoalType() {
+        return goalType;
+    }
+
+    public void setGoalType(GoalType goalType) {
+        this.goalType = goalType;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
     }
 
     public Long getId() {
@@ -77,4 +123,5 @@ public class User {
     public void setWorkouts(List<Workout> workouts) {
         this.workouts = workouts;
     }
+
 }

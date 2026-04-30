@@ -1,5 +1,6 @@
 package com.workoutplanner.backend.controller;
 
+import com.workoutplanner.backend.dto.UserGoalsRequest;
 import com.workoutplanner.backend.model.User;
 import com.workoutplanner.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,11 @@ public class UserController {
     @PutMapping("/{id}")
     public User update(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
+    }
+
+    @PutMapping("/{id}/goals")
+    public User updateGoals(@PathVariable Long id, @RequestBody UserGoalsRequest request) {
+        return userService.updateGoals(id, request);
     }
 
     @DeleteMapping("/{id}")

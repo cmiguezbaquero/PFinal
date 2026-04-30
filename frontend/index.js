@@ -26,15 +26,22 @@ async function loadDashboard() {
 
   const routines = routinesRes.ok ? await routinesRes.json() : [];
   const workouts = workoutsRes.ok ? await workoutsRes.json() : [];
+
   const compliance = complianceRes.ok
     ? await complianceRes.json()
     : { planned: 0, completed: 0, percentage: 0 };
 
-  document.getElementById("activePlans").textContent = `Active Plans: ${routines.length}`;
-  document.getElementById("weeklyWorkouts").textContent = `Weekly Workouts: ${workouts.length}`;
+  document.getElementById("activePlans").textContent =
+    `Active Plans: ${routines.length}`;
+
+  document.getElementById("weeklyWorkouts").textContent =
+    `Weekly Workouts: ${workouts.length}`;
+
+  // 🔥 FIX IMPORTANTE
+  const percentage = compliance.percentage ?? 0;
+
   document.getElementById("complianceCard").textContent =
-    `Compliance: ${compliance.completed}/${compliance.planned} (${compliance.percentage.toFixed(1)}%)`;
+    `Compliance: ${compliance.completed}/${compliance.planned} (${percentage.toFixed(1)}%)`;
 }
 
 loadDashboard();
-

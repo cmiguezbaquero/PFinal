@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Gym - Goals</title>
+
+  <!-- ✔ usa un css válido o quítalo -->
+  <link rel="stylesheet" href="../index.css">
+</head>
+
+<body>
+
+<h2>Configura tus objetivos</h2>
+
+<div>
+  <label>Objetivo:</label>
+  <select id="type">
+    <option value="lose_weight">Perder peso</option>
+    <option value="gain_muscle">Ganar músculo</option>
+    <option value="maintain">Mantener</option>
+  </select>
+</div>
+
+<div>
+  <label>Días por semana:</label>
+  <input type="number" id="days" min="1" max="7" placeholder="Ej: 3" />
+</div>
+
+<div>
+  <label>Nivel:</label>
+  <select id="level">
+    <option value="beginner">Principiante</option>
+    <option value="intermediate">Intermedio</option>
+    <option value="advanced">Avanzado</option>
+  </select>
+</div>
+
+<button id="saveGoalBtn">Guardar</button>
+
+<script type="module" src="goals.js"></script>
+
+</body>
+</html>
