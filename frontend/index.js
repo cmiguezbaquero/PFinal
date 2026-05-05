@@ -1,3 +1,6 @@
+import { API } from "../shared/api.js";
+import { getCurrentUser } from "../shared/session.js";
+
 function getWeekStartISO() {
   const now = new Date();
   const day = now.getDay();
@@ -18,6 +21,7 @@ async function loadDashboard() {
   homeUser.textContent = `Welcome ${currentUser.name}`;
 
   const weekStart = getWeekStartISO();
+
   const [routinesRes, workoutsRes, complianceRes] = await Promise.all([
     fetch(`${API.routines}/user/${currentUser.id}`),
     fetch(`${API.workouts}/user/${currentUser.id}/week/${weekStart}`),
@@ -37,8 +41,7 @@ async function loadDashboard() {
   document.getElementById("weeklyWorkouts").textContent =
     `Weekly Workouts: ${workouts.length}`;
 
-  // 🔥 FIX IMPORTANTE
-  const percentage = compliance.percentage ?? 0;
+  const percentage = Number(compliance.percentage ?? 0);
 
   document.getElementById("complianceCard").textContent =
     `Compliance: ${compliance.completed}/${compliance.planned} (${percentage.toFixed(1)}%)`;

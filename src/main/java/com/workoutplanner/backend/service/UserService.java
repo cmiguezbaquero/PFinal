@@ -1,7 +1,9 @@
 package com.workoutplanner.backend.service;
 
 import com.workoutplanner.backend.dto.UserGoalsRequest;
+import com.workoutplanner.backend.model.Goal;
 import com.workoutplanner.backend.model.User;
+import com.workoutplanner.backend.repository.GoalRepository;
 import com.workoutplanner.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,9 +22,11 @@ import java.util.Base64;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final GoalRepository goalRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public UserService (UserRepository userRepository){
+    public UserService (UserRepository userRepository, GoalRepository goalRepository){
+        this.goalRepository =goalRepository;
         this.userRepository = userRepository;
     }
 
@@ -108,12 +112,23 @@ public class UserService {
             throw new ResponseStatusException(BAD_REQUEST, "Training days must be between 1 and 7");
         }
 
+        //ACTUZALIZAR USER
         user.setGoalType(req.getGoalType());
         user.setLevel(req.getLevel());
         user.setTrainingDaysPerWeek(req.getTrainingDaysPerWeek());
         user.setHasGoals(true);
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        Goal goal = new Goal();
+        goal.setGoalType(req.getGoalType());
+        goal.setLevel(req.getLevel());
+        goal.setDaysPerWeek(req.getTrainingDaysPerWeek());
+        goal.setUser(user);
+
+        goalRepository.save(goal);
+
+        return user;
     }
 
     public void deleteUser(Long id) {

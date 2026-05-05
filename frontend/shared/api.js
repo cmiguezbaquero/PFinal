@@ -1,5 +1,7 @@
 const BASE_URL = "http://localhost:8080/api";
 
+// ENPOINTS
+
 export const API = {
   auth: `${BASE_URL}/auth`,
   users: `${BASE_URL}/users`,
@@ -9,27 +11,22 @@ export const API = {
   sessions: `${BASE_URL}/workout-sessions`
 };
 
-// 🔥 GOALS (backend correcto)
-export function updateGoals(userId, data) {
-  return fetch(`${BASE_URL}/users/${userId}/goals`, {
+// GOALS
+
+export async function updateGoals(userId, data) {
+  const res = await fetch(`${API.users}/${userId}/goals`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
   });
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(error || "Error updating goals");
+  }
+
+  return res.json();
 }
 
-// 👤 USER STORAGE
-export function getCurrentUser() {
-  const raw = localStorage.getItem("currentUser");
-  return raw ? JSON.parse(raw) : null;
-}
-
-export function setCurrentUser(user) {
-  localStorage.setItem("currentUser", JSON.stringify(user));
-}
-
-export function clearCurrentUser() {
-  localStorage.removeItem("currentUser");
-}
