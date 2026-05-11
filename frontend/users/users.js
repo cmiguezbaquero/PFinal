@@ -5,6 +5,102 @@ const usersAPI = API.users;
 const authAPI = API.auth;
 
 /* =========================
+   INIT
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const user = getCurrentUser();
+
+  // ⚠️ IMPORTANTE: no redirigir si estás en users.html
+  // solo si quieres proteger páginas internas
+  if (user && window.location.pathname.includes("users.html")) {
+    renderAuthState();
+    loadUsers();
+  } else {
+    renderAuthState();
+    loadUsers();
+  }
+});
+
+/* =========================
+   REGISTER
+========================= */
+
+async function createUser(event) {
+  if (event) event.preventDefault();
+
+  const res = await fetch(`${authAPI}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: document.getElementById("registerName").value,
+      email: document.getElementById("registerEmail").value,
+      password: document.getElementById("registerPassword").value
+    })
+  });
+
+  if (!res.ok) {
+    alert("Error al registrarse");
+    return;
+  }
+
+  const user = await res.json();
+  setCurrentUser(user);
+
+  // 👉 flujo correcto
+  window.location.href = "../goals/goals.html";
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+async function loginUser(event) {
+  if (event) event.preventDefault();
+
+  const res = await fetch(`${authAPI}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: document.getElementById("loginEmail").value,
+      password: document.getElementById("loginPassword").value
+    })
+  });
+
+  if (!res.ok) {
+    alert("Email o contraseña incorrectos");
+    return;
+  }
+
+  const user = await res.json();
+  setCurrentUser(user);
+
+  window.location.href = user.hasGoals
+    ? "../index.html"
+    : "../goals/goals.html";
+}
+
+/* =========================
+   TOGGLE LOGIN / REGISTER
+========================= */
+
+function showLogin() {
+  document.getElementById("loginForm")?.classList.remove("hidden");
+  document.getElementById("registerForm")?.classList.add("hidden");
+}
+
+function showRegister() {
+  document.getElementById("registerForm")?.classList.remove("hidden");
+  document.getElementById("loginForm")?.classList.add("hidden");
+}
+
+/* botones */
+document.getElementById("showLogin")?.addEventListener("click", showLogin);
+document.getElementById("showRegister")?.addEventListener("click", showRegister);
+document.getElementById("goLogin")?.addEventListener("click", showLogin);
+document.getElementById("goRegister")?.addEventListener("click", showRegister);
+
+/* =========================
    USERS LIST
 ========================= */
 
@@ -18,6 +114,8 @@ async function loadUsers() {
 
 function render(users) {
   const container = document.getElementById("users-container");
+  if (!container) return;
+
   container.innerHTML = "";
 
   users.forEach(u => {
@@ -34,80 +132,8 @@ function render(users) {
 }
 
 /* =========================
-   AUTH
+   SESSION UI
 ========================= */
-async function createUser() {
-  const res = await fetch(`${authAPI}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: document.getElementById("registerName").value,
-      email: document.getElementById("registerEmail").value,
-      password: document.getElementById("registerPassword").value
-    })
-  });
-
-  if (!res.ok) {
-    alert(await res.text());
-    return;
-  }
-
-  const user = await res.json();
-  setCurrentUser(user);
-
-  window.location.href = "../goals/goals.html";
-}
-
-async function loginUser() {
-  const res = await fetch(`${authAPI}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: document.getElementById("loginEmail").value,
-      password: document.getElementById("loginPassword").value
-    })
-  });
-
-  if (!res.ok) {
-    alert("Login failed");
-    return;
-  }
-
-  const user = await res.json();
-  setCurrentUser(user);
-
-  window.location.href = user.hasGoals
-    ? "../index.html"
-    : "../goals/goals.html";
-}
-
-async function deleteUser(id) {
-  await fetch(`${usersAPI}/${id}`, { method: "DELETE" });
-  loadUsers();
-}
-
-async function searchUser() {
-  const email = document.getElementById("searchEmail").value;
-
-  const res = await fetch(`${usersAPI}/email/${email}`);
-
-  if (!res.ok) {
-    render([]);
-    return;
-  }
-
-  const user = await res.json();
-  render([user]);
-}
-
-/* =========================
-   SESSION
-========================= */
-
-function logoutUser() {
-  clearCurrentUser();
-  renderAuthState();
-}
 
 function renderAuthState() {
   const currentUser = getCurrentUser();
@@ -116,25 +142,26 @@ function renderAuthState() {
   if (!authStatus) return;
 
   authStatus.textContent = currentUser
-    ? `Logged in as ${currentUser.name} (${currentUser.email})`
-    : "No active session";
+    ? `Conectado como ${currentUser.name}`
+    : "No hay sesión activa";
 }
 
 /* =========================
-   EXPORT TO HTML (LEGACY BRIDGE)
+   GLOBALS (HTML onclick)
 ========================= */
 
 window.createUser = createUser;
 window.loginUser = loginUser;
-window.logoutUser = logoutUser;
-window.searchUser = searchUser;
-window.loadUsers = loadUsers;
+window.logoutUser = () => {
+  clearCurrentUser();
+  location.reload();
+};
+window.searchUser = async function () {
+  const email = document.getElementById("searchEmail").value;
 
-/* =========================
-   INIT
-========================= */
+  const res = await fetch(`${usersAPI}/email/${email}`);
+  if (!res.ok) return render([]);
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderAuthState();
-  loadUsers();
-});
+  const user = await res.json();
+  render([user]);
+};

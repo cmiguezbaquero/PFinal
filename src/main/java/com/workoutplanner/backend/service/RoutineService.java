@@ -13,10 +13,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RoutineService {
@@ -103,6 +106,14 @@ public class RoutineService {
         List<Exercise> availableExercises =
                 exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId);
 
+        List<Exercise> chest = filterByGroup(availableExercises, "CHEST");
+        List<Exercise> back = filterByGroup(availableExercises, "BACK");
+        List<Exercise> legs = filterByGroup(availableExercises, "LEGS");
+        List<Exercise> shoulders = filterByGroup(availableExercises, "SHOULDERS");
+        List<Exercise> arms = filterByGroup(availableExercises, "ARMS");
+        List<Exercise> core = filterByGroup(availableExercises, "CORE");
+
+
         if (availableExercises.isEmpty()) {
             throw new ResponseStatusException(BAD_REQUEST, "No exercises available");
         }
@@ -124,11 +135,14 @@ public class RoutineService {
 
         int exerciseIndex = 0;
 
+
         // =========================
         // CREACIÓN DE WORKOUTS
         // =========================
 
         for (int i = 0; i < dayOffsets.length; i++) {
+
+            Set<Long> usedExercises = new HashSet<>();
 
             Workout workout = new Workout();
             workout.setDescription("Session " + (i + 1));
@@ -138,12 +152,58 @@ public class RoutineService {
 
             List<WorkoutExercise> exercises = new ArrayList<>();
 
-            for (int j = 0; j < 3; j++) {
+            List<Exercise> selectedExercises = new ArrayList<>();
 
-                Exercise exercise = availableExercises.get(exerciseIndex % availableExercises.size());
-                exerciseIndex++;
+            if (i == 0) {
+                // PUSH
+                selectedExercises.addAll(chest);
+                selectedExercises.addAll(shoulders);
+                selectedExercises.addAll(arms);
 
+            } else if (i == 1) {
+                // PULL
+                selectedExercises.addAll(back);
+                selectedExercises.addAll(arms);
+
+            } else if (i == 2) {
+                // LEGS
+                selectedExercises.addAll(legs);
+
+            } else {
+                // FULL / CORE
+                selectedExercises.addAll(core);
+                selectedExercises.addAll(chest);
+                selectedExercises.addAll(back);
+            }
+
+            // fallback por si algún grupo está vacío
+            if (selectedExercises.isEmpty()) {
+                selectedExercises = availableExercises;
+            }
+
+            // coger 3 ejercicios
+            int count = 0;
+            int index = 0;
+
+            while (count < 3 && index < selectedExercises.size()) {
+                Exercise exercise = selectedExercises.get(index);
+
+                if (!usedExercises.contains(exercise.getId())) {
+                    exercises.add(buildWorkoutExercise(user, workout, exercise));
+                    usedExercises.add(exercise.getId());
+                    count++;
+                }
+
+                index++;
+            }
+
+            // fallback por si no hay suficientes únicos
+            index = 0;
+            while (count < 3) {
+                Exercise exercise = selectedExercises.get(index % selectedExercises.size());
                 exercises.add(buildWorkoutExercise(user, workout, exercise));
+                count++;
+                index++;
             }
 
             workout.setExercises(exercises);
@@ -168,24 +228,36 @@ public class RoutineService {
         we.setExercise(exercise);
 
         // ---- GOAL ----
-        if ("gain_muscle".equals(user.getGoalType())) {
-            we.setSets(4);
-            we.setReps(10);
-        } else if ("lose_weight".equals(user.getGoalType())) {
-            we.setSets(3);
-            we.setReps(15);
-        } else {
-            we.setSets(3);
-            we.setReps(10);
+        switch (user.getGoalType()) {
+            case GANAR_MUSCULO:
+                we.setSets(4);
+                we.setReps(10);
+                break;
+
+            case PERDER_PESO:
+                we.setSets(3);
+                we.setReps(15);
+                break;
+
+            case MANTENER_FORMA:
+                we.setSets(3);
+                we.setReps(10);
+                break;
         }
 
         // ---- LEVEL ----
-        if ("beginner".equals(user.getLevel())) {
-            we.setWeight(0);
-        } else if ("intermediate".equals(user.getLevel())) {
-            we.setWeight(20);
-        } else {
-            we.setWeight(40);
+        switch (user.getLevel()) {
+            case PRINCIPIANTE:
+                we.setWeight(0);
+                break;
+
+            case INTERMEDIO:
+                we.setWeight(20);
+                break;
+
+            case AVANZADO:
+                we.setWeight(40);
+                break;
         }
 
         return we;
@@ -214,4 +286,11 @@ public class RoutineService {
 
         return offsets;
     }
+
+    private List<Exercise> filterByGroup(List<Exercise> all, String group) {
+        return all.stream()
+                .filter(e -> group.equalsIgnoreCase(e.getMuscleGroup()))
+                .toList();
+    }
+
 }

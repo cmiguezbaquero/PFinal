@@ -1,137 +1,112 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;600;700&display=swap');
-
-:root {
-  --bg: #0a0f1c;
-  --panel: rgba(255,255,255,0.06);
-  --stroke: rgba(0,255,255,0.15);
-
-  --primary: #00e5ff;
-  --secondary: #7c4dff;
-  --accent: #ffe66d;
-
-  --text: #e6f1ff;
-  --muted: rgba(230,241,255,0.6);
-
-  --radius: 18px;
-  --blur: blur(14px);
-}
-
 body {
   margin: 0;
-  font-family: 'Manrope', sans-serif;
-  background: radial-gradient(circle at top, #0f1a33, var(--bg));
-  color: var(--text);
-}
+  font-family: Arial, sans-serif;
 
-/* HEADER */
-.header {
-  padding: 25px;
-  text-align: center;
-}
+  background: #0b0f1a;
+  color: #e5e7eb;
 
-.header h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 48px;
-  letter-spacing: 2px;
-  color: var(--primary);
-  text-shadow: 0 0 20px var(--primary);
-}
-
-/* NAV */
-.nav {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  padding: 10px;
+  align-items: center;
+  height: 100vh;
 }
 
-.nav a {
-  color: var(--text);
-  text-decoration: none;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: var(--panel);
-  backdrop-filter: var(--blur);
-  border: 1px solid var(--stroke);
-  transition: 0.3s;
+/* WRAPPER */
+.auth-wrapper {
+  text-align: center;
+  width: 340px;
 }
 
-.nav a:hover {
-  box-shadow: 0 0 15px var(--primary);
-  transform: translateY(-2px);
+/* LOGO */
+.logo {
+  font-size: 34px;
+  letter-spacing: 4px;
+
+  background: linear-gradient(90deg, #ff4fd8, #7c4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  margin-bottom: 5px;
 }
 
-/* CONTAINER */
-.container {
-  width: 90%;
-  max-width: 1100px;
-  margin: auto;
+.subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
 }
 
-/* GLASS PANEL */
-.panel {
-  background: var(--panel);
-  backdrop-filter: var(--blur);
-  border: 1px solid var(--stroke);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin: 15px 0;
-  box-shadow: 0 0 30px rgba(0,0,0,0.2);
-  animation: fadeIn 0.5s ease;
-}
-
-/* CARDS */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-}
-
+/* CARD */
 .card {
-  background: var(--panel);
-  border: 1px solid var(--stroke);
-  border-radius: var(--radius);
-  padding: 15px;
-  transition: 0.3s;
-}
+  background: #121a2b;
+  border: 1px solid rgba(255, 79, 216, 0.15);
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 20px var(--primary);
-}
+  padding: 22px;
+  border-radius: 16px;
 
-/* BUTTONS */
-button {
-  background: transparent;
-  border: 1px solid var(--primary);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.3s;
-}
+  margin-top: 10px;
 
-button:hover {
-  box-shadow: 0 0 15px var(--primary);
-  background: rgba(0,229,255,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
 
 /* INPUTS */
 input {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--stroke);
-  padding: 10px;
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+
+  background: #0f1629;
+  border: 1px solid rgba(255, 79, 216, 0.15);
+
+  color: white;
   border-radius: 10px;
-  color: var(--text);
+
   outline: none;
 }
 
 input:focus {
-  box-shadow: 0 0 10px var(--secondary);
+  border-color: #ff4fd8;
+  box-shadow: 0 0 10px rgba(255,79,216,0.2);
 }
 
-/* ANIMATIONS */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+
+  margin-top: 10px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, #ff4fd8, #7c4dff);
+  color: white;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+button:hover {
+  box-shadow: 0 0 15px rgba(255,79,216,0.25);
+}
+
+/* SWITCH TEXT */
+.switch {
+  margin-top: 12px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+}
+
+.switch span {
+  color: #ff4fd8;
+  cursor: pointer;
+}
+
+.switch span:hover {
+  text-decoration: underline;
+}
+
+/* HIDDEN */
+.hidden {
+  display: none;
 }

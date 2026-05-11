@@ -1,11 +1,11 @@
 package com.workoutplanner.backend.controller;
-
-import com.workoutplanner.backend.dto.WeeklyGenerationRequest;
 import com.workoutplanner.backend.model.Routine;
 import com.workoutplanner.backend.service.RoutineService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/routines")
@@ -39,8 +39,12 @@ public class RoutineController {
     }
 
     @PostMapping("/weekly/generate")
-    public Routine generateWeeklyPlan(@RequestBody WeeklyGenerationRequest request) {
-        return service.generateWeeklyPlan(request.getUserId(), request.getWeekStart());
+    public Routine generateWeeklyPlan(@RequestBody Map<String, String> body) {
+
+        Long userId = Long.parseLong(body.get("userId"));
+        LocalDate weekStart = LocalDate.parse(body.get("weekStart"));
+
+        return service.generateWeeklyPlan(userId, weekStart);
     }
 
     @PutMapping("/{id}")

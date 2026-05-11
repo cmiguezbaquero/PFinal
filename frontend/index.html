@@ -2,38 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cyber Gym - Home</title>
+  <title>FitPlan - Auth</title>
   <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
 
-<header class="header">
-  <h1>Cyber Gym</h1>
-  <p>Training Dashboard</p>
-</header>
+<div class="auth-wrapper">
 
-<nav class="nav">
-  <a href="./index.html">Home</a>
-  <a href="users/users.html">Users</a>
-  <a href="exercises/exercises.html">Exercises</a>
-  <a href="workouts/workouts.html">Workouts</a>
-  <a href="workouts-list/workouts-list.html">Workouts List</a>
-</nav>
+  <h1 class="logo">FITPLAN</h1>
+  <p class="subtitle">Build your best version</p>
 
-<main class="container">
+  <!-- LOGIN -->
+  <div id="loginForm" class="card">
 
-  <section class="panel">
-    <h2>Overview</h2>
-    <p id="homeUser">Login from Users page to see your dashboard.</p>
-    <div class="grid">
-      <div class="card" id="activePlans">Active Plans: -</div>
-      <div class="card" id="weeklyWorkouts">Weekly Workouts: -</div>
-      <div class="card" id="complianceCard">Compliance: -</div>
-    </div>
-  </section>
+    <h2>Sign in</h2>
 
-</main>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+
+    <button onclick="loginUser()">Login</button>
+
+    <p class="switch">
+      No account?
+      <span onclick="showRegister()">Create one</span>
+    </p>
+
+  </div>
+
+  <!-- REGISTER -->
+  <div id="registerForm" class="card hidden">
+
+    <h2>Create account</h2>
+
+    <input id="registerName" placeholder="Name">
+    <input id="registerEmail" type="email" placeholder="Email">
+    <input id="registerPassword" type="password" placeholder="Password">
+
+    <button onclick="createUser()">Register</button>
+
+    <p class="switch">
+      Already have an account?
+      <span onclick="showLogin()">Sign in</span>
+    </p>
+
+  </div>
+
+</div>
 
 <script type="module" src="index.js"></script>
 

@@ -18,7 +18,6 @@ function getWeekStartISO() {
 /* =========================
    SAVE GOALS
 ========================= */
-
 async function saveGoal() {
   const days = Number(document.getElementById("days").value);
   const goalType = document.getElementById("type").value;
@@ -30,12 +29,20 @@ async function saveGoal() {
   }
 
   try {
-    const updatedUser = await updateGoals(user.id, {
+    const res = await updateGoals(user.id, {
       goalType,
       level,
       trainingDaysPerWeek: days
     });
 
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Error backend:", errorText);
+      alert("Error guardando objetivos");
+      return;
+    }
+
+    const updatedUser = await res.json();
     setCurrentUser(updatedUser);
 
     const routineRes = await fetch(`${API.routines}/weekly/generate`, {
@@ -44,8 +51,8 @@ async function saveGoal() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        userId: user.id,
-        weekStart: new Date().toISOString().split("T")[0]
+        userId: updatedUser.id,
+        weekStart: getWeekStartISO()
       })
     });
 
@@ -59,9 +66,10 @@ async function saveGoal() {
     window.location.href = "../index.html";
 
   } catch (err) {
-    console.error(err);
-    alert("Error guardando objetivos");
-  }
+  console.error("CATCH ERROR COMPLETO:", err);
+  console.error("MENSAJE:", err.message);
+  alert(err.message);
+}
 }
 
 /* =========================

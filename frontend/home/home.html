@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FitPlan - Home</title>
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h1 class="logo">FITPLAN</h1>
+
+    <nav>
+      <button onclick="showSection('dashboard')">Dashboard</button>
+      <button onclick="showSection('workouts')">Workouts</button>
+      <button onclick="showSection('progress')">Progress</button>
+      <button onclick="logout()">Logout</button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+
+      <div class="header-card">
+        <h2 id="welcomeText">Welcome back 👋</h2>
+        <p>Your personalized training plan</p>
+      </div>
+
+      <div class="grid">
+
+        <div class="card highlight">
+          <h3>Today's Workout</h3>
+          <p>Upper Body Strength</p>
+          <button>Start</button>
+        </div>
+
+        <div class="card">
+          <h3>Weekly Progress</h3>
+          <div class="progress-bar">
+            <div id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Calendar</h3>
+          <div class="calendar" id="calendar"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- WORKOUTS -->
+    <section id="workouts" class="section">
+
+      <h2>Your Routine</h2>
+        <p style="opacity:0.7">Drag & drop to reorder your workout</p>
+
+        <div class="grid" id="workoutList"></div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="progress" class="section">
+
+      <h2>Progress</h2>
+
+      <div class="card">
+        <p>Sessions completed this week</p>
+        <h1 id="sessionsDone">0</h1>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script type="module" src="home.js"></script>
+</body>
+</html>

@@ -14,19 +14,12 @@ export const API = {
 // GOALS
 
 export async function updateGoals(userId, data) {
-  const res = await fetch(`${API.users}/${userId}/goals`, {
+  return fetch(`${API.users}/${userId}/goals`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
   });
-
-  if (!res.ok) {
-    const error = await res.text();
-    throw new Error(error || "Error updating goals");
-  }
-
-  return res.json();
 }
 

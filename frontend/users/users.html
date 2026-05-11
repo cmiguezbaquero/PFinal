@@ -1,56 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Cyber Gym - Users</title>
+  <title>FitPlan - Acceso</title>
   <link rel="stylesheet" href="users.css">
 </head>
 
 <body>
 
 <header class="header">
-  <h1>Users</h1>
+  <h1>FitPlan</h1>
+  <p>Tu entrenamiento inteligente</p>
 </header>
 
-<nav class="nav">
-  <a href="../index.html">Home</a>
-  <a href="users.html">Users</a>
-</nav>
+<main class="auth-container">
 
-<main class="container">
+  <!-- TOGGLE BUTTONS -->
+  <div class="toggle-box">
+    <button id="showLogin" class="toggle active">Ya tengo cuenta</button>
+    <button id="showRegister" class="toggle">Empezar</button>
+  </div>
 
-  <section class="panel">
-    <h2>Create account</h2>
-    <div class="form">
-      <input id="registerName" placeholder="Name">
-      <input id="registerEmail" placeholder="Email">
-      <input id="registerPassword" type="password" placeholder="Password">
-      <button onclick="createUser()">Register</button>
-    </div>
+  <!-- LOGIN -->
+  <section id="loginForm" class="panel auth-card">
+    <h2>Iniciar sesión</h2>
+
+    <input id="loginEmail" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Contraseña">
+
+    <button onclick="loginUser()">Entrar</button>
+
+    <p class="switch-text">
+      ¿No tienes cuenta?
+      <span id="goRegister">Regístrate</span>
+    </p>
   </section>
 
-  <section class="panel">
-    <h2>Login</h2>
-    <div class="form">
-      <input id="loginEmail" placeholder="Email">
-      <input id="loginPassword" type="password" placeholder="Password">
-      <button onclick="loginUser()">Login</button>
-      <button onclick="logoutUser()">Logout</button>
-    </div>
-    <p id="auth-status"></p>
-  </section>
+  <!-- REGISTER -->
+  <section id="registerForm" class="panel auth-card hidden">
+    <h2>Crear cuenta</h2>
 
-  <section class="panel">
-    <h2>Users (admin view)</h2>
-    <div class="form">
-      <input id="searchEmail" placeholder="Search by email">
-      <button onclick="searchUser()">Search</button>
-      <button onclick="loadUsers()">Reset</button>
-    </div>
-    <div id="users-container" class="grid"></div>
+    <input id="registerName" placeholder="Nombre">
+    <input id="registerEmail" placeholder="Email">
+    <input id="registerPassword" type="password" placeholder="Contraseña">
+
+    <button onclick="createUser()">Empezar</button>
+
+    <p class="switch-text">
+      ¿Ya tienes cuenta?
+      <span id="goLogin">Inicia sesión</span>
+    </p>
   </section>
 
 </main>
+
+<p id="auth-status" class="auth-status"></p>
 
 <script type="module" src="users.js"></script>
 

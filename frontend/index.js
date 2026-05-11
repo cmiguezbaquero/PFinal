@@ -1,50 +1,97 @@
-import { API } from "../shared/api.js";
-import { getCurrentUser } from "../shared/session.js";
+import { API } from "./shared/api.js";
+import { setCurrentUser, getCurrentUser } from "./shared/session.js";
 
-function getWeekStartISO() {
-  const now = new Date();
-  const day = now.getDay();
-  const diffToMonday = (day + 6) % 7;
-  now.setDate(now.getDate() - diffToMonday);
-  return now.toISOString().slice(0, 10);
-}
+const authAPI = API.auth;
 
-async function loadDashboard() {
-  const currentUser = getCurrentUser();
-  const homeUser = document.getElementById("homeUser");
+/* =========================
+   AUTO CHECK (SOLO REDIRECT SI YA LOGUEADO)
+========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const user = getCurrentUser();
 
-  if (!currentUser) {
-    homeUser.textContent = "Login from Users page to see your dashboard.";
+  // 🔥 SI NO HAY USER, QUEDARSE EN INDEX (LOGIN)
+  if (!user) return;
+
+  // 🔥 SI HAY USER, DECIDIR RUTA
+  if (user.hasGoals) {
+    window.location.href = "./home/home.html";
+  } else {
+    window.location.href = "./goals/goals.html";
+  }
+});
+
+/* =========================
+   LOGIN
+========================= */
+async function loginUser() {
+  const res = await fetch(`${authAPI}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: loginEmail.value,
+      password: loginPassword.value
+    })
+  });
+
+  if (!res.ok) {
+    alert("Login incorrecto");
     return;
   }
 
-  homeUser.textContent = `Welcome ${currentUser.name}`;
+  const user = await res.json();
+  setCurrentUser(user);
 
-  const weekStart = getWeekStartISO();
+  console.log("LOGIN USER:", user);
 
-  const [routinesRes, workoutsRes, complianceRes] = await Promise.all([
-    fetch(`${API.routines}/user/${currentUser.id}`),
-    fetch(`${API.workouts}/user/${currentUser.id}/week/${weekStart}`),
-    fetch(`${API.sessions}/compliance/user/${currentUser.id}/week/${weekStart}`)
-  ]);
-
-  const routines = routinesRes.ok ? await routinesRes.json() : [];
-  const workouts = workoutsRes.ok ? await workoutsRes.json() : [];
-
-  const compliance = complianceRes.ok
-    ? await complianceRes.json()
-    : { planned: 0, completed: 0, percentage: 0 };
-
-  document.getElementById("activePlans").textContent =
-    `Active Plans: ${routines.length}`;
-
-  document.getElementById("weeklyWorkouts").textContent =
-    `Weekly Workouts: ${workouts.length}`;
-
-  const percentage = Number(compliance.percentage ?? 0);
-
-  document.getElementById("complianceCard").textContent =
-    `Compliance: ${compliance.completed}/${compliance.planned} (${percentage.toFixed(1)}%)`;
+  // 🔥 FLUJO CORRECTO
+  if (user.hasGoals) {
+    window.location.href = "./home/home.html";
+  } else {
+    window.location.href = "./goals/goals.html";
+  }
 }
 
-loadDashboard();
+/* =========================
+   REGISTER
+========================= */
+async function createUser() {
+  const res = await fetch(`${authAPI}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: registerName.value,
+      email: registerEmail.value,
+      password: registerPassword.value
+    })
+  });
+
+  if (!res.ok) {
+    alert("Error registro");
+    return;
+  }
+
+  const user = await res.json();
+  setCurrentUser(user);
+
+  // 🔥 NUEVO USUARIO → SIEMPRE GOALS
+  window.location.href = "./goals/goals.html";
+}
+
+/* =========================
+   UI TOGGLE
+========================= */
+function showLogin() {
+  loginForm.classList.remove("hidden");
+  registerForm.classList.add("hidden");
+}
+
+function showRegister() {
+  registerForm.classList.remove("hidden");
+  loginForm.classList.add("hidden");
+}
+
+/* GLOBAL */
+window.loginUser = loginUser;
+window.createUser = createUser;
+window.showLogin = showLogin;
+window.showRegister = showRegister;
