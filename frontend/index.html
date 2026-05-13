@@ -1,56 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>FitPlan - Auth</title>
-  <link rel="stylesheet" href="index.css">
+ <meta charset="UTF-8">
+ <title>FitPlan - Auth</title>
+ <link rel="stylesheet" href="index.css">
 </head>
+
 
 <body>
 
+
 <div class="auth-wrapper">
 
-  <h1 class="logo">FITPLAN</h1>
-  <p class="subtitle">Build your best version</p>
 
-  <!-- LOGIN -->
-  <div id="loginForm" class="card">
+ <h1 class="logo">FITPLAN</h1>
+ <p class="subtitle">Build your best version</p>
 
-    <h2>Sign in</h2>
 
-    <input id="loginEmail" type="email" placeholder="Email">
-    <input id="loginPassword" type="password" placeholder="Password">
+ <!-- LOGIN -->
+ <div id="loginForm" class="card">
 
-    <button onclick="loginUser()">Login</button>
 
-    <p class="switch">
-      No account?
-      <span onclick="showRegister()">Create one</span>
-    </p>
+   <h2>Sign in</h2>
 
-  </div>
 
-  <!-- REGISTER -->
-  <div id="registerForm" class="card hidden">
+   <input id="loginEmail" type="email" placeholder="Email">
+   <input id="loginPassword" type="password" placeholder="Password">
 
-    <h2>Create account</h2>
 
-    <input id="registerName" placeholder="Name">
-    <input id="registerEmail" type="email" placeholder="Email">
-    <input id="registerPassword" type="password" placeholder="Password">
+   <button onclick="loginUser()">Login</button>
 
-    <button onclick="createUser()">Register</button>
 
-    <p class="switch">
-      Already have an account?
-      <span onclick="showLogin()">Sign in</span>
-    </p>
+   <p class="switch">
+     No account?
+     <span onclick="showRegister()">Create one</span>
+   </p>
 
-  </div>
+
+ </div>
+
+
+ <!-- REGISTER -->
+ <div id="registerForm" class="card hidden">
+
+
+   <h2>Create account</h2>
+
+
+   <input id="registerName" placeholder="Name">
+   <input id="registerEmail" type="email" placeholder="Email">
+   <input id="registerPassword" type="password" placeholder="Password">
+
+
+   <button onclick="createUser()">Register</button>
+
+
+   <p class="switch">
+     Already have an account?
+     <span onclick="showLogin()">Sign in</span>
+   </p>
+
+
+ </div>
+
 
 </div>
 
+
 <script type="module" src="index.js"></script>
+
 
 </body>
 </html>

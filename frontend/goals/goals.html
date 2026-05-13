@@ -1,43 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Cyber Gym - Goals</title>
+ <meta charset="UTF-8">
+ <title>FitPlan - Goals</title>
 
-  <!-- ✔ usa un css válido o quítalo -->
-  <link rel="stylesheet" href="../index.css">
+
+ <link rel="stylesheet" href="../index.css">
 </head>
+
 
 <body>
 
-<h2>Configura tus objetivos</h2>
 
-<div>
-  <label>Objetivo:</label>
-  <select id="type">
-  <option value="PERDER_PESO">Perder peso</option>
-  <option value="GANAR_MUSCULO">Ganar músculo</option>
-  <option value="MANTENER_FORMA">Mantener</option>
-</select>
+<div class="auth-wrapper">
+
+
+ <h1 class="logo">FITPLAN</h1>
+ <p class="subtitle">Configura tus objetivos</p>
+
+
+ <div class="card">
+   <form id="goalsForm" class="goals-form" novalidate>
+
+
+     <div class="form-group">
+       <label for="type">Objetivo</label>
+       <select id="type" name="type">
+         <option value="PERDER_PESO">Perder peso</option>
+         <option value="GANAR_MUSCULO">Ganar músculo</option>
+         <option value="MANTENER_FORMA">Mantener</option>
+       </select>
+     </div>
+
+
+     <div class="form-group">
+       <label for="days">Días por semana</label>
+       <input
+         type="number"
+         id="days"
+         name="days"
+         min="1"
+         max="7"
+         placeholder="Ej: 3"
+         required
+       />
+     </div>
+
+
+     <div class="form-group">
+       <label for="level">Nivel</label>
+       <select id="level" name="level">
+         <option value="PRINCIPIANTE">Principiante</option>
+         <option value="INTERMEDIO">Intermedio</option>
+         <option value="AVANZADO">Avanzado</option>
+       </select>
+     </div>
+
+
+     <div class="form-actions">
+       <button id="saveGoalBtn" type="submit">Guardar objetivos</button>
+     </div>
+
+
+   </form>
+ </div>
+
+
 </div>
 
-<div>
-  <label>Días por semana:</label>
-  <input type="number" id="days" min="1" max="7" placeholder="Ej: 3" />
-</div>
-
-<div>
-  <label>Nivel:</label>
-  <select id="level">
-  <option value="PRINCIPIANTE">Principiante</option>
-  <option value="INTERMEDIO">Intermedio</option>
-  <option value="AVANZADO">Avanzado</option>
-</select>
-</div>
-
-<button id="saveGoalBtn">Guardar</button>
 
 <script type="module" src="goals.js"></script>
+
 
 </body>
 </html>
