@@ -23,3 +23,23 @@ export async function updateGoals(userId, data) {
   });
 }
 
+export async function generateWeeklyRoutine(userId, weekStart) {
+  return fetch(`${API.routines}/weekly/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ userId, weekStart })
+  });
+}
+
+export async function getWeeklyWorkouts(userId, weekStart) {
+  return fetch(`${API.workouts}/user/${userId}/week/${weekStart}`);
+}
+
+export async function toggleWorkoutCompletion(workoutId, completed = true) {
+  return fetch(`${API.workouts}/${workoutId}/completion?completed=${completed}`, {
+    method: "PUT"
+  });
+}
+

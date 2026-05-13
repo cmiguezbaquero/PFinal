@@ -5,6 +5,8 @@ import com.workoutplanner.backend.model.Routine;
 import com.workoutplanner.backend.model.User;
 import com.workoutplanner.backend.model.Workout;
 import com.workoutplanner.backend.model.WorkoutExercise;
+import com.workoutplanner.backend.enums.GoalType;
+import com.workoutplanner.backend.enums.Level;
 import com.workoutplanner.backend.repository.ExerciseRepository;
 import com.workoutplanner.backend.repository.RoutineRepository;
 import com.workoutplanner.backend.repository.UserRepository;
@@ -13,13 +15,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
 import java.util.HashSet;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class RoutineService {
@@ -105,18 +108,12 @@ public class RoutineService {
 
         List<Exercise> availableExercises =
                 exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId);
-
-        List<Exercise> chest = filterByGroup(availableExercises, "CHEST");
-        List<Exercise> back = filterByGroup(availableExercises, "BACK");
-        List<Exercise> legs = filterByGroup(availableExercises, "LEGS");
-        List<Exercise> shoulders = filterByGroup(availableExercises, "SHOULDERS");
-        List<Exercise> arms = filterByGroup(availableExercises, "ARMS");
-        List<Exercise> core = filterByGroup(availableExercises, "CORE");
-
-
         if (availableExercises.isEmpty()) {
             throw new ResponseStatusException(BAD_REQUEST, "No exercises available");
         }
+
+        GoalType goalType = user.getGoalType();
+        Level level = user.getLevel();
 
         Routine routine = new Routine();
         routine.setName("Weekly plan " + weekStart);
@@ -126,6 +123,7 @@ public class RoutineService {
         routine.setUser(user);
 
         List<Workout> workouts = new ArrayList<>();
+        Set<Long> weeklyUsedExercises = new HashSet<>();
 
         // =========================
         // DÍAS SEGÚN USUARIO
@@ -133,16 +131,11 @@ public class RoutineService {
 
         int[] dayOffsets = buildDayOffsets(days);
 
-        int exerciseIndex = 0;
-
-
         // =========================
         // CREACIÓN DE WORKOUTS
         // =========================
 
         for (int i = 0; i < dayOffsets.length; i++) {
-
-            Set<Long> usedExercises = new HashSet<>();
 
             Workout workout = new Workout();
             workout.setDescription("Session " + (i + 1));
@@ -150,60 +143,19 @@ public class RoutineService {
             workout.setRoutine(routine);
             workout.setPlannedDate(weekStart.plusDays(dayOffsets[i]));
 
+            List<String> templateGroups = buildWorkoutTemplate(goalType, i);
+            List<Exercise> selectedExercises = selectExercisesForWorkout(
+                    availableExercises,
+                    templateGroups,
+                    goalType,
+                    level,
+                    weeklyUsedExercises,
+                    goalType == GoalType.PERDER_PESO ? 4 : 3
+            );
+
             List<WorkoutExercise> exercises = new ArrayList<>();
-
-            List<Exercise> selectedExercises = new ArrayList<>();
-
-            if (i == 0) {
-                // PUSH
-                selectedExercises.addAll(chest);
-                selectedExercises.addAll(shoulders);
-                selectedExercises.addAll(arms);
-
-            } else if (i == 1) {
-                // PULL
-                selectedExercises.addAll(back);
-                selectedExercises.addAll(arms);
-
-            } else if (i == 2) {
-                // LEGS
-                selectedExercises.addAll(legs);
-
-            } else {
-                // FULL / CORE
-                selectedExercises.addAll(core);
-                selectedExercises.addAll(chest);
-                selectedExercises.addAll(back);
-            }
-
-            // fallback por si algún grupo está vacío
-            if (selectedExercises.isEmpty()) {
-                selectedExercises = availableExercises;
-            }
-
-            // coger 3 ejercicios
-            int count = 0;
-            int index = 0;
-
-            while (count < 3 && index < selectedExercises.size()) {
-                Exercise exercise = selectedExercises.get(index);
-
-                if (!usedExercises.contains(exercise.getId())) {
-                    exercises.add(buildWorkoutExercise(user, workout, exercise));
-                    usedExercises.add(exercise.getId());
-                    count++;
-                }
-
-                index++;
-            }
-
-            // fallback por si no hay suficientes únicos
-            index = 0;
-            while (count < 3) {
-                Exercise exercise = selectedExercises.get(index % selectedExercises.size());
+            for (Exercise exercise : selectedExercises) {
                 exercises.add(buildWorkoutExercise(user, workout, exercise));
-                count++;
-                index++;
             }
 
             workout.setExercises(exercises);
@@ -231,12 +183,12 @@ public class RoutineService {
         switch (user.getGoalType()) {
             case GANAR_MUSCULO:
                 we.setSets(4);
-                we.setReps(10);
+                we.setReps(8);
                 break;
 
             case PERDER_PESO:
                 we.setSets(3);
-                we.setReps(15);
+                we.setReps(12);
                 break;
 
             case MANTENER_FORMA:
@@ -287,10 +239,187 @@ public class RoutineService {
         return offsets;
     }
 
-    private List<Exercise> filterByGroup(List<Exercise> all, String group) {
-        return all.stream()
-                .filter(e -> group.equalsIgnoreCase(e.getMuscleGroup()))
+    private List<String> buildWorkoutTemplate(GoalType goalType, int workoutIndex) {
+        List<List<String>> templates = switch (goalType) {
+            case GANAR_MUSCULO -> List.of(
+                    List.of("CHEST", "SHOULDERS", "ARMS"),
+                    List.of("BACK", "ARMS"),
+                    List.of("LEGS", "CORE"),
+                    List.of("CHEST", "BACK", "SHOULDERS"),
+                    List.of("LEGS", "ARMS", "CORE")
+            );
+            case PERDER_PESO -> List.of(
+                    List.of("FULL"),
+                    List.of("CARDIO", "CORE", "LEGS"),
+                    List.of("CARDIO", "FULL"),
+                    List.of("CORE", "LEGS", "CARDIO")
+            );
+            case MANTENER_FORMA -> List.of(
+                    List.of("FULL"),
+                    List.of("CHEST", "BACK", "CORE"),
+                    List.of("LEGS", "SHOULDERS"),
+                    List.of("CARDIO", "CORE")
+            );
+        };
+
+        return templates.get(workoutIndex % templates.size());
+    }
+
+    private List<Exercise> selectExercisesForWorkout(List<Exercise> availableExercises,
+                                                     List<String> templateGroups,
+                                                     GoalType goalType,
+                                                     Level level,
+                                                     Set<Long> weeklyUsedExercises,
+                                                     int targetCount) {
+        // Selección determinista evitando duplicados por ID.
+        List<Exercise> selection = new ArrayList<>();
+        // Mantener IDs seleccionados para garantizar unicidad
+        Set<Long> selectedIds = new LinkedHashSet<>();
+
+        // Rankear todos los candidatos una vez
+        List<Exercise> rankedAll = rankExercises(availableExercises, goalType, level);
+
+        // 1) Intento por grupos: recorro rankedAll y cojo los que concuerden con cada grupo
+        outer:
+        for (String group : templateGroups) {
+            for (Exercise candidate : rankedAll) {
+                if (!matchesGroup(candidate.getMuscleGroup(), group)) continue;
+                Long id = candidate.getId();
+                if (id == null) continue; // defensivo
+                if (selectedIds.contains(id)) continue; // ya seleccionado en este workout
+                if (weeklyUsedExercises != null && weeklyUsedExercises.contains(id)) continue; // ya usado esta semana
+
+                selection.add(candidate);
+                selectedIds.add(id);
+                if (weeklyUsedExercises != null) weeklyUsedExercises.add(id);
+
+                if (selection.size() >= targetCount) break outer;
+            }
+        }
+
+        // 2) Rellenar con el resto de rankedAll (evitando duplicados y weeklyUsed si aplicable)
+        for (Exercise candidate : rankedAll) {
+            if (selection.size() >= targetCount) break;
+            Long id = candidate.getId();
+            if (id == null) continue;
+            if (selectedIds.contains(id)) continue;
+            if (weeklyUsedExercises != null && weeklyUsedExercises.contains(id)) continue;
+
+            selection.add(candidate);
+            selectedIds.add(id);
+            if (weeklyUsedExercises != null) weeklyUsedExercises.add(id);
+        }
+
+        // 3) Si todavía no hay suficientes, permitir ignorar weeklyUsedExercises para rellenar
+        if (selection.size() < targetCount) {
+            for (Exercise candidate : rankedAll) {
+                if (selection.size() >= targetCount) break;
+                Long id = candidate.getId();
+                if (id == null) continue;
+                if (selectedIds.contains(id)) continue;
+                selection.add(candidate);
+                selectedIds.add(id);
+            }
+        }
+
+        return selection;
+    }
+
+    private void fillSelection(List<Exercise> selection,
+                               List<String> templateGroups,
+                               List<Exercise> availableExercises,
+                               GoalType goalType,
+                               Level level,
+                               Set<Long> weeklyUsedExercises,
+                               int targetCount,
+                               boolean avoidWeeklyRepeats) {
+        for (String group : templateGroups) {
+            List<Exercise> rankedCandidates = rankExercises(
+                    availableExercises.stream()
+                            .filter(exercise -> matchesGroup(exercise.getMuscleGroup(), group))
+                            .toList(),
+                    goalType,
+                    level
+            );
+
+            for (Exercise exercise : rankedCandidates) {
+                if (containsExercise(selection, exercise.getId())) {
+                    continue;
+                }
+                if (avoidWeeklyRepeats && weeklyUsedExercises.contains(exercise.getId())) {
+                    continue;
+                }
+
+                selection.add(exercise);
+                if (avoidWeeklyRepeats) {
+                    weeklyUsedExercises.add(exercise.getId());
+                }
+
+                if (selection.size() == targetCount) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private List<Exercise> rankExercises(List<Exercise> exercises, GoalType goalType, Level level) {
+        return exercises.stream()
+                .sorted(Comparator
+                        .comparingInt((Exercise exercise) -> exerciseScore(exercise, goalType, level))
+                        .thenComparing(Exercise::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
+    }
+
+    private int exerciseScore(Exercise exercise, GoalType goalType, Level level) {
+        int score = 0;
+
+        if (goalType != null && exercise.getGoalType() != null && exercise.getGoalType() != goalType) {
+            score += 100;
+        }
+
+        if (level != null) {
+            if (exercise.getLevel() == null) {
+                score += 10;
+            } else {
+                int diff = exercise.getLevel().ordinal() - level.ordinal();
+                if (diff > 0) {
+                    score += 40 + diff;
+                } else {
+                    score += Math.abs(diff);
+                }
+            }
+        }
+
+        return score;
+    }
+
+    private boolean containsExercise(List<Exercise> exercises, Long exerciseId) {
+        return exercises.stream().anyMatch(exercise -> exercise.getId() != null && exercise.getId().equals(exerciseId));
+    }
+
+    private boolean matchesGroup(String actualGroup, String templateGroup) {
+        String normalizedActual = normalizeGroup(actualGroup);
+        String normalizedTemplate = normalizeGroup(templateGroup);
+
+        return "FULL".equals(normalizedTemplate)
+                || normalizedActual.equals(normalizedTemplate);
+    }
+
+    private String normalizeGroup(String muscleGroup) {
+        if (muscleGroup == null) {
+            return "";
+        }
+
+        return switch (muscleGroup.trim().toUpperCase()) {
+            case "CHEST", "PECHO", "PECTORAL", "PECTORALES" -> "CHEST";
+            case "BACK", "ESPALDA" -> "BACK";
+            case "LEGS", "PIERNAS", "GLUTEOS", "GLÚTEOS" -> "LEGS";
+            case "SHOULDERS", "HOMBRO", "HOMBROS" -> "SHOULDERS";
+            case "ARMS", "ARM", "BRAZO", "BRAZOS", "BICEPS", "TRICEPS" -> "ARMS";
+            case "CORE", "ABDOMEN", "ABS", "ABDOMINAL", "CINTURA" -> "CORE";
+            case "CARDIO", "AEROBICO", "AERÓBICO" -> "CARDIO";
+            default -> muscleGroup.trim().toUpperCase();
+        };
     }
 
 }

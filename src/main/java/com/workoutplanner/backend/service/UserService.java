@@ -1,9 +1,7 @@
 package com.workoutplanner.backend.service;
 
 import com.workoutplanner.backend.dto.UserGoalsRequest;
-import com.workoutplanner.backend.model.Goal;
 import com.workoutplanner.backend.model.User;
-import com.workoutplanner.backend.repository.GoalRepository;
 import com.workoutplanner.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,11 +20,9 @@ import java.util.Base64;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final GoalRepository goalRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public UserService (UserRepository userRepository, GoalRepository goalRepository){
-        this.goalRepository =goalRepository;
+    public UserService (UserRepository userRepository){
         this.userRepository = userRepository;
     }
 
@@ -102,33 +98,16 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND));
 
-        if (req.getGoalType() == null){
-            throw new ResponseStatusException(BAD_REQUEST, "Goal type is required");
-        }
-        if (req.getLevel() == null) {
-            throw new ResponseStatusException(BAD_REQUEST, "Level is required");
-        }
-        if (req.getTrainingDaysPerWeek() < 1 || req.getTrainingDaysPerWeek() > 7) {
-            throw new ResponseStatusException(BAD_REQUEST, "Training days must be between 1 and 7");
-        }
+        validateGoalsRequest(req);
 
-        //ACTUZALIZAR USER
         user.setGoalType(req.getGoalType());
         user.setLevel(req.getLevel());
         user.setTrainingDaysPerWeek(req.getTrainingDaysPerWeek());
         user.setHasGoals(true);
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        Goal goal = new Goal();
-        goal.setGoalType(req.getGoalType());
-        goal.setLevel(req.getLevel());
-        goal.setDaysPerWeek(req.getTrainingDaysPerWeek());
-        goal.setUser(user);
-
-        goalRepository.save(goal);
-
-        return user;
+        return savedUser;
     }
 
     public void deleteUser(Long id) {
@@ -154,6 +133,18 @@ public class UserService {
         }
         if (password.length() < 6) {
             throw new ResponseStatusException(BAD_REQUEST, "Password must be at least 6 characters");
+        }
+    }
+
+    private void validateGoalsRequest(UserGoalsRequest req) {
+        if (req.getGoalType() == null) {
+            throw new ResponseStatusException(BAD_REQUEST, "Goal type is required");
+        }
+        if (req.getLevel() == null) {
+            throw new ResponseStatusException(BAD_REQUEST, "Level is required");
+        }
+        if (req.getTrainingDaysPerWeek() < 1 || req.getTrainingDaysPerWeek() > 7) {
+            throw new ResponseStatusException(BAD_REQUEST, "Training days must be between 1 and 7");
         }
     }
 

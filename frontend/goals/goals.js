@@ -1,5 +1,6 @@
-import { API, updateGoals } from "../shared/api.js";
+import { generateWeeklyRoutine, updateGoals } from "../shared/api.js";
 import { getCurrentUser, setCurrentUser } from "../shared/session.js";
+import { getWeekStartISO } from "../shared/date.js";
 
 const user = getCurrentUser();
 
@@ -7,18 +8,12 @@ if (!user) {
   window.location.href = "../users/users.html";
 }
 
-function getWeekStartISO() {
-  const now = new Date();
-  const day = now.getDay();
-  const diffToMonday = (day + 6) % 7;
-  now.setDate(now.getDate() - diffToMonday);
-  return now.toISOString().slice(0, 10);
-}
-
 /* =========================
    SAVE GOALS
 ========================= */
-async function saveGoal() {
+async function saveGoal(event) {
+  event?.preventDefault();
+
   const days = Number(document.getElementById("days").value);
   const goalType = document.getElementById("type").value;
   const level = document.getElementById("level").value;
@@ -45,16 +40,7 @@ async function saveGoal() {
     const updatedUser = await res.json();
     setCurrentUser(updatedUser);
 
-    const routineRes = await fetch(`${API.routines}/weekly/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userId: updatedUser.id,
-        weekStart: getWeekStartISO()
-      })
-    });
+    const routineRes = await generateWeeklyRoutine(updatedUser.id, getWeekStartISO());
 
     if (!routineRes.ok) {
       const errorText = await routineRes.text();
@@ -64,17 +50,16 @@ async function saveGoal() {
     }
 
     window.location.href = "../index.html";
-
   } catch (err) {
-  console.error("CATCH ERROR COMPLETO:", err);
-  console.error("MENSAJE:", err.message);
-  alert(err.message);
-}
+    console.error("CATCH ERROR COMPLETO:", err);
+    console.error("MENSAJE:", err.message);
+    alert(err.message);
+  }
 }
 
 /* =========================
    INIT
 ========================= */
 
-document.getElementById("saveGoalBtn")
-  .addEventListener("click", saveGoal);
+document.getElementById("goalsForm")
+  .addEventListener("submit", saveGoal);
