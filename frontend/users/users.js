@@ -29,26 +29,29 @@ document.addEventListener("DOMContentLoaded", () => {
 async function createUser(event) {
   if (event) event.preventDefault();
 
-  const res = await fetch(`${authAPI}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: document.getElementById("registerName").value,
-      email: document.getElementById("registerEmail").value,
-      password: document.getElementById("registerPassword").value
-    })
-  });
+  try {
+    const res = await fetch(`${authAPI}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: document.getElementById("registerName").value,
+        email: document.getElementById("registerEmail").value,
+        password: document.getElementById("registerPassword").value
+      })
+    });
 
-  if (!res.ok) {
-    alert("Error al registrarse");
-    return;
+    if (!res.ok) {
+      alert("Error al registrarse");
+      return;
+    }
+
+    const user = await res.json();
+    setCurrentUser(user);
+    window.location.href = "../goals/goals.html";
+  } catch (error) {
+    console.error("Error de red en registro", error);
+    alert("No se pudo conectar con el servidor");
   }
-
-  const user = await res.json();
-  setCurrentUser(user);
-
-  // 👉 flujo correcto
-  window.location.href = "../goals/goals.html";
 }
 
 /* =========================
@@ -58,26 +61,31 @@ async function createUser(event) {
 async function loginUser(event) {
   if (event) event.preventDefault();
 
-  const res = await fetch(`${authAPI}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: document.getElementById("loginEmail").value,
-      password: document.getElementById("loginPassword").value
-    })
-  });
+  try {
+    const res = await fetch(`${authAPI}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: document.getElementById("loginEmail").value,
+        password: document.getElementById("loginPassword").value
+      })
+    });
 
-  if (!res.ok) {
-    alert("Email o contraseña incorrectos");
-    return;
+    if (!res.ok) {
+      alert("Email o contraseña incorrectos");
+      return;
+    }
+
+    const user = await res.json();
+    setCurrentUser(user);
+
+    window.location.href = user.hasGoals
+      ? "../index.html"
+      : "../goals/goals.html";
+  } catch (error) {
+    console.error("Error de red en login", error);
+    alert("No se pudo conectar con el servidor");
   }
-
-  const user = await res.json();
-  setCurrentUser(user);
-
-  window.location.href = user.hasGoals
-    ? "../index.html"
-    : "../goals/goals.html";
 }
 
 /* =========================

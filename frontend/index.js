@@ -24,30 +24,40 @@ document.addEventListener("DOMContentLoaded", () => {
    LOGIN
 ========================= */
 async function loginUser() {
-  const res = await fetch(`${authAPI}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: loginEmail.value,
-      password: loginPassword.value
-    })
-  });
+  const emailInput = document.getElementById("loginEmail");
+  const passwordInput = document.getElementById("loginPassword");
 
-  if (!res.ok) {
-    alert("Login incorrecto");
+  if (!emailInput || !passwordInput) {
+    alert("Formulario de login no disponible");
     return;
   }
 
-  const user = await res.json();
-  setCurrentUser(user);
+  try {
+    const res = await fetch(`${authAPI}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: emailInput.value,
+        password: passwordInput.value
+      })
+    });
 
-  console.log("LOGIN USER:", user);
+    if (!res.ok) {
+      alert("Login incorrecto");
+      return;
+    }
 
-  // 🔥 FLUJO CORRECTO
-  if (user.hasGoals) {
-    window.location.href = "./home/home.html";
-  } else {
-    window.location.href = "./goals/goals.html";
+    const user = await res.json();
+    setCurrentUser(user);
+
+    if (user.hasGoals) {
+      window.location.href = "./home/home.html";
+    } else {
+      window.location.href = "./goals/goals.html";
+    }
+  } catch (error) {
+    console.error("Error de red en login", error);
+    alert("No se pudo conectar con el servidor. Comprueba que el backend está en http://localhost:8080");
   }
 }
 
@@ -55,39 +65,56 @@ async function loginUser() {
    REGISTER
 ========================= */
 async function createUser() {
-  const res = await fetch(`${authAPI}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: registerName.value,
-      email: registerEmail.value,
-      password: registerPassword.value
-    })
-  });
+  const nameInput = document.getElementById("registerName");
+  const emailInput = document.getElementById("registerEmail");
+  const passwordInput = document.getElementById("registerPassword");
 
-  if (!res.ok) {
-    alert("Error registro");
+  if (!nameInput || !emailInput || !passwordInput) {
+    alert("Formulario de registro no disponible");
     return;
   }
 
-  const user = await res.json();
-  setCurrentUser(user);
+  try {
+    const res = await fetch(`${authAPI}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: nameInput.value,
+        email: emailInput.value,
+        password: passwordInput.value
+      })
+    });
 
-  // 🔥 NUEVO USUARIO → SIEMPRE GOALS
-  window.location.href = "./goals/goals.html";
+    if (!res.ok) {
+      alert("Error registro");
+      return;
+    }
+
+    const user = await res.json();
+    setCurrentUser(user);
+
+    window.location.href = "./goals/goals.html";
+  } catch (error) {
+    console.error("Error de red en registro", error);
+    alert("No se pudo conectar con el servidor. Comprueba que el backend está en http://localhost:8080");
+  }
 }
 
 /* =========================
    UI TOGGLE
 ========================= */
 function showLogin() {
-  loginForm.classList.remove("hidden");
-  registerForm.classList.add("hidden");
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  loginForm?.classList.remove('hidden');
+  registerForm?.classList.add('hidden');
 }
 
 function showRegister() {
-  registerForm.classList.remove("hidden");
-  loginForm.classList.add("hidden");
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  registerForm?.classList.remove('hidden');
+  loginForm?.classList.add('hidden');
 }
 
 /* GLOBAL */

@@ -325,42 +325,6 @@ public class RoutineService {
         return selection;
     }
 
-    private void fillSelection(List<Exercise> selection,
-                               List<String> templateGroups,
-                               List<Exercise> availableExercises,
-                               GoalType goalType,
-                               Level level,
-                               Set<Long> weeklyUsedExercises,
-                               int targetCount,
-                               boolean avoidWeeklyRepeats) {
-        for (String group : templateGroups) {
-            List<Exercise> rankedCandidates = rankExercises(
-                    availableExercises.stream()
-                            .filter(exercise -> matchesGroup(exercise.getMuscleGroup(), group))
-                            .toList(),
-                    goalType,
-                    level
-            );
-
-            for (Exercise exercise : rankedCandidates) {
-                if (containsExercise(selection, exercise.getId())) {
-                    continue;
-                }
-                if (avoidWeeklyRepeats && weeklyUsedExercises.contains(exercise.getId())) {
-                    continue;
-                }
-
-                selection.add(exercise);
-                if (avoidWeeklyRepeats) {
-                    weeklyUsedExercises.add(exercise.getId());
-                }
-
-                if (selection.size() == targetCount) {
-                    return;
-                }
-            }
-        }
-    }
 
     private List<Exercise> rankExercises(List<Exercise> exercises, GoalType goalType, Level level) {
         return exercises.stream()
@@ -393,9 +357,6 @@ public class RoutineService {
         return score;
     }
 
-    private boolean containsExercise(List<Exercise> exercises, Long exerciseId) {
-        return exercises.stream().anyMatch(exercise -> exercise.getId() != null && exercise.getId().equals(exerciseId));
-    }
 
     private boolean matchesGroup(String actualGroup, String templateGroup) {
         String normalizedActual = normalizeGroup(actualGroup);

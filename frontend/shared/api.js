@@ -43,3 +43,14 @@ export async function toggleWorkoutCompletion(workoutId, completed = true) {
   });
 }
 
+// Create a standalone exercise (backend contract: POST /exercises)
+export async function createExercise(data) {
+  return fetch(`${API.exercises}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+}
+

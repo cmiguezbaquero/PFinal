@@ -2,82 +2,185 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>FitPlan - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitPlan – Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../index.css">
   <link rel="stylesheet" href="home.css">
 </head>
 <body>
 
 <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h1 class="logo">FITPLAN</h1>
+  <!-- ═══════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════ -->
+  <aside class="left-panel">
 
-    <nav>
-      <button onclick="showSection('dashboard')">Dashboard</button>
-      <button onclick="showSection('workouts')">Workouts</button>
-      <button onclick="showSection('progress')">Progress</button>
-      <button onclick="logout()">Logout</button>
+    <div class="sidebar-brand">
+      <span class="logo">FP</span>
+      <span class="brand-name">FITPLAN</span>
+    </div>
+
+    <nav class="small-nav">
+      <button class="nav-btn active" onclick="showSection('dashboard')" data-section="dashboard">
+        <span class="nav-icon">◈</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-btn" onclick="showSection('workouts')" data-section="workouts">
+        <span class="nav-icon">⊞</span>
+        <span class="nav-label">Workouts</span>
+      </button>
+      <button class="nav-btn" onclick="showSection('progress')" data-section="progress">
+        <span class="nav-icon">◎</span>
+        <span class="nav-label">Progress</span>
+      </button>
     </nav>
+
+    <div class="progress-section card">
+      <p class="progress-label">Weekly goal</p>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
+      <p class="progress-stat"><strong id="sessionsDone">0</strong> sessions done</p>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="add-btn" onclick="showAddExercise()">
+        <span>＋</span> Add exercise
+      </button>
+      <button class="logout-btn" onclick="logout()">
+        <span>↪</span> Logout
+      </button>
+    </div>
+
   </aside>
 
-  <!-- MAIN -->
+  <!-- ═══════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════════ -->
   <main class="main">
 
-    <!-- DASHBOARD -->
+    <!-- ── DASHBOARD ── -->
     <section id="dashboard" class="section active">
 
-      <div class="header-card">
-        <h2 id="welcomeText">Welcome back 👋</h2>
-        <p>Your personalized training plan</p>
+      <div class="page-header">
+        <div>
+          <h2 id="welcomeText">Welcome back 👋</h2>
+          <p class="page-sub">Your week at a glance</p>
+        </div>
+        <span class="badge">This week</span>
       </div>
 
-      <div class="grid">
-
-        <div class="card highlight">
-          <h3>Today's Workout</h3>
-          <p>Upper Body Strength</p>
-          <button>Start</button>
-        </div>
-
-        <div class="card">
-          <h3>Weekly Progress</h3>
-          <div class="progress-bar">
-            <div id="progressFill"></div>
+      <!-- Today highlight -->
+      <div class="highlight card">
+        <div class="highlight-inner">
+          <div class="highlight-text">
+            <p class="highlight-eyebrow">Today's focus</p>
+            <h3>Today's Workout</h3>
+            <p>Generate your goals to unlock a personalized plan.</p>
           </div>
+          <button onclick="showSection('workouts')">View routine</button>
         </div>
+      </div>
 
-        <div class="card">
-          <h3>Calendar</h3>
-          <div class="calendar" id="calendar"></div>
+      <!-- Week calendar — big day cards -->
+      <div class="week-grid-wrap">
+        <p class="section-label">This week</p>
+        <div class="week-grid" id="weekGrid" aria-label="Week view">
+          <!-- JS injects 7 × button.day-tile here -->
         </div>
+      </div>
 
+      <!-- Day detail panel — slides open below the grid -->
+      <div id="dayDetail" class="day-detail-panel hidden">
+        <div class="day-detail-header">
+          <div>
+            <p class="day-detail-eyebrow">Scheduled exercises</p>
+            <h3 id="dayDetailTitle">Day</h3>
+          </div>
+          <button class="close-btn" onclick="closeDayDetail()">✕</button>
+        </div>
+        <!-- JS fills this with .exercise-detail-card items -->
+        <div id="dayExercises" class="day-exercises-grid"></div>
       </div>
 
     </section>
 
-    <!-- WORKOUTS -->
+    <!-- ── WORKOUTS ── -->
     <section id="workouts" class="section">
-
-      <h2>Your Routine</h2>
-        <p style="opacity:0.7">Drag & drop to reorder your workout</p>
-
-        <div class="grid" id="workoutList"></div>
+      <div class="page-header">
+        <div>
+          <h2>Your Routine</h2>
+          <p class="page-sub">Drag to reorder · click to complete</p>
+        </div>
+      </div>
+      <div class="grid" id="workoutList"></div>
     </section>
 
-    <!-- PROGRESS -->
+    <!-- ── PROGRESS ── -->
     <section id="progress" class="section">
-
-      <h2>Progress</h2>
-
-      <div class="card">
-        <p>Sessions completed this week</p>
-        <h1 id="sessionsDone">0</h1>
+      <div class="page-header">
+        <div>
+          <h2>Progress</h2>
+          <p class="page-sub">Track your consistency</p>
+        </div>
       </div>
-
+      <div class="progress-detail-card card">
+        <p class="progress-detail-label">Sessions completed this week</p>
+        <h1 id="sessionsDoneDetail" class="progress-big-num">0</h1>
+        <div class="progress-bar large">
+          <div id="progressFill"></div>
+        </div>
+      </div>
     </section>
 
   </main>
+
+  <!-- ═══════════════════════════════════════
+       ADD EXERCISE DRAWER
+  ══════════════════════════════════════════ -->
+  <aside class="right-panel hidden" id="addExercisePanel">
+    <div class="drawer-card card">
+
+      <div class="drawer-header">
+        <h3>Add Exercise</h3>
+        <button class="close-btn" onclick="hideAddExercise()">✕</button>
+      </div>
+
+      <form id="addExerciseForm" class="drawer-form">
+
+        <div class="form-group">
+          <label class="form-label">Exercise name</label>
+          <input name="name" placeholder="e.g. Bench press" required />
+        </div>
+
+        <div class="drawer-row">
+          <div class="form-group">
+            <label class="form-label">Sets</label>
+            <input name="sets" type="number" min="1" value="3" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reps</label>
+            <input name="reps" type="number" min="1" value="10" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Day</label>
+          <select name="day" id="addExerciseDay"></select>
+        </div>
+
+        <div class="drawer-actions">
+          <button type="submit">Add exercise</button>
+          <button type="button" class="btn-ghost" onclick="hideAddExercise()">Cancel</button>
+        </div>
+
+      </form>
+    </div>
+  </aside>
 
 </div>
 
