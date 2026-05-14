@@ -4,6 +4,10 @@ import { getCurrentUser, setCurrentUser, clearCurrentUser } from "../shared/sess
 const usersAPI = API.users;
 const authAPI = API.auth;
 
+function isValidRegistrationEmail(email) {
+  return typeof email === "string" && email.includes("@");
+}
+
 /* =========================
    INIT
 ========================= */
@@ -29,14 +33,29 @@ document.addEventListener("DOMContentLoaded", () => {
 async function createUser(event) {
   if (event) event.preventDefault();
 
+  const nameInput = document.getElementById("registerName");
+  const emailInput = document.getElementById("registerEmail");
+  const passwordInput = document.getElementById("registerPassword");
+
+  if (!nameInput || !emailInput || !passwordInput) {
+    alert("Formulario de registro no disponible");
+    return;
+  }
+
+  if (!isValidRegistrationEmail(emailInput.value.trim())) {
+    alert("El correo debe incluir @");
+    emailInput.focus();
+    return;
+  }
+
   try {
     const res = await fetch(`${authAPI}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: document.getElementById("registerName").value,
-        email: document.getElementById("registerEmail").value,
-        password: document.getElementById("registerPassword").value
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        password: passwordInput.value
       })
     });
 

@@ -40,9 +40,9 @@
   <section id="registerForm" class="panel auth-card hidden">
     <h2>Crear cuenta</h2>
 
-    <input id="registerName" placeholder="Nombre">
-    <input id="registerEmail" placeholder="Email">
-    <input id="registerPassword" type="password" placeholder="Contraseña">
+    <input id="registerName" placeholder="Nombre" required>
+    <input id="registerEmail" type="email" placeholder="Email" required pattern=".+@.+">
+    <input id="registerPassword" type="password" placeholder="Contraseña" required>
 
     <button onclick="createUser()">Empezar</button>
 

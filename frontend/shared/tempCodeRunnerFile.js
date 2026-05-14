@@ -1,1 +1,0 @@
-console.log("USER GOALS:", updatedUser.goalType, updatedUser.level);

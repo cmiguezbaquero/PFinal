@@ -8,7 +8,8 @@ export const API = {
   exercises: `${BASE_URL}/exercises`,
   routines: `${BASE_URL}/routines`,
   workouts: `${BASE_URL}/workouts`,
-  sessions: `${BASE_URL}/workout-sessions`
+  sessions: `${BASE_URL}/workout-sessions`,
+  recommendations: `${BASE_URL}/recommendations`
 };
 
 // GOALS
@@ -54,3 +55,46 @@ export async function createExercise(data) {
   });
 }
 
+/* =========================================================
+   COMPLIANCE
+========================================================= */
+
+export function getCompliance(userId, weekStart) {
+  return fetch(`${API.sessions}/compliance/user/${userId}/week/${weekStart}`);
+}
+
+/* =========================================================
+   RECOMMENDATIONS
+========================================================= */
+
+export function getRecommendations(userId) {
+  return fetch(`${API.recommendations}/${userId}`);
+}
+
+/* =========================================================
+   AVAILABLE EXERCISES
+========================================================= */
+
+export function getAvailableExercises(userId) {
+  return fetch(`${API.exercises}/available/${userId}`);
+}
+
+/* =========================================================
+   USERS
+========================================================= */
+
+export function updateUser(userId, data) {
+  return fetch(`${API.users}/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+export function deleteUser(userId) {
+  return fetch(`${API.users}/${userId}`, {
+    method: "DELETE"
+  });
+}

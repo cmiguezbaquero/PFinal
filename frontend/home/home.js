@@ -1,7 +1,15 @@
 import { clearCurrentUser, getCurrentUser } from "../shared/session.js";
 import { getWeekStartISO } from "../shared/date.js";
-import { getWeeklyWorkouts, toggleWorkoutCompletion, createExercise } from "../shared/api.js";
-
+import {
+  getWeeklyWorkouts,
+  toggleWorkoutCompletion,
+  createExercise,
+  getCompliance,
+  getRecommendations,
+  getAvailableExercises,
+  updateUser,
+  deleteUser
+} from "../shared/api.js";
 /* =========================
    INIT
 ========================= */
@@ -17,6 +25,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   renderWeekGrid();
   await loadWorkouts(user);
+  await loadCompliance(user);
+  await loadRecommendations(user);
   populateAddExerciseDays();
 });
 
@@ -83,6 +93,7 @@ async function loadWorkouts(user) {
     renderDashboardSummary(workouts);
     updateProgress(workouts.filter(w => w.completed).length, workouts.length);
     renderWeekTilesFromWorkouts(workouts);
+    renderHistory(workouts);
   } catch (error) {
     console.error(error);
     const localWorkouts = buildWorkoutsFromLocal(user.id, weekStart);
@@ -473,7 +484,7 @@ function renderExercises(exercises) {
 
 function updateProgress(done, total) {
   const sessionsDone = document.getElementById("sessionsDone");
-  const fills        = document.querySelectorAll("#progressFill");
+  const fills        = document.querySelectorAll(".progress-fill");
   const pct          = total > 0 ? Math.round((done / total) * 100) : 0;
 
   if (sessionsDone) sessionsDone.innerText = String(done);
@@ -516,4 +527,209 @@ function getDragAfterElement(container, y) {
 window.logout = () => {
   clearCurrentUser();
   window.location.href = "../index.html";
+};
+
+window.logoutUser = window.logout;
+
+/* =========================================================
+   WEEKLY COMPLIANCE
+========================================================= */
+
+async function loadCompliance(user) {
+
+  try {
+
+    const res = await getCompliance(user.id, getWeekStartISO());
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    const completed = data.completedSessions || 0;
+    const planned   = data.plannedSessions || 0;
+
+    const percent = planned > 0
+      ? Math.round((completed / planned) * 100)
+      : 0;
+
+    document.getElementById("completedSessions").innerText = completed;
+    document.getElementById("plannedSessions").innerText = planned;
+    document.getElementById("compliancePercent").innerText = `${percent}%`;
+
+    const circumference = 327;
+    const offset = circumference - (percent / 100) * circumference;
+
+    document.getElementById("complianceCircle")
+      .style.strokeDashoffset = offset;
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+/* =========================================================
+   RECOMMENDATIONS
+========================================================= */
+
+async function loadRecommendations(user) {
+
+  const container = document.getElementById("recommendationsGrid");
+
+  if (!container) return;
+
+  try {
+
+    const res = await getRecommendations(user.id);
+
+    if (!res.ok) return;
+
+    const recommendations = await res.json();
+
+    container.innerHTML = "";
+
+    recommendations.forEach(exercise => {
+
+      const card = document.createElement("div");
+
+      card.className = "recommend-card";
+
+      card.innerHTML = `
+        <div class="recommend-title">
+          ${exercise.name}
+        </div>
+
+        <div class="recommend-meta">
+
+          <span class="recommend-pill">
+            ${exercise.muscleGroup || "Full Body"}
+          </span>
+
+          <span class="recommend-pill">
+            ${exercise.difficulty || "Intermediate"}
+          </span>
+
+        </div>
+
+        <p style="margin-top:14px; opacity:.7;">
+          ${exercise.description || ""}
+        </p>
+      `;
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function renderHistory(workouts) {
+
+  const container = document.getElementById("historyList");
+
+  if (!container) return;
+
+  const completed = workouts.filter(w => w.completed);
+
+  if (!completed.length) {
+
+    container.innerHTML = `
+      <div class="card" style="padding:24px;">
+        No completed workouts yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  completed.forEach(workout => {
+
+    const card = document.createElement("div");
+
+    card.className = "history-card";
+
+    card.innerHTML = `
+      <div class="history-top">
+        <strong>${workout.description}</strong>
+        <span class="history-complete">Completed</span>
+      </div>
+
+      <div class="history-date">
+        ${workout.plannedDate}
+      </div>
+
+      <div style="margin-top:14px;">
+        ${(workout.exercises || []).length} exercises
+      </div>
+    `;
+
+    container.appendChild(card);
+
+  });
+}
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+document.getElementById("profileForm")
+?.addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+
+  const user = getCurrentUser();
+
+  try {
+
+    const payload = {
+      name: document.getElementById("profileName").value,
+      email: document.getElementById("profileEmail").value
+    };
+
+    const res = await updateUser(user.id, payload);
+
+    if (!res.ok) {
+      alert("Could not update profile");
+      return;
+    }
+
+    alert("Profile updated");
+
+  } catch (err) {
+    console.error(err);
+  }
+
+});
+
+window.deleteAccount = async () => {
+
+  const confirmed = confirm("Delete account permanently?");
+
+  if (!confirmed) return;
+
+  const user = getCurrentUser();
+
+  try {
+
+    const res = await deleteUser(user.id);
+
+    if (!res.ok) {
+      alert("Could not delete account");
+      return;
+    }
+
+    clearCurrentUser();
+
+    window.location.href = "../index.html";
+
+  } catch (err) {
+    console.error(err);
+  }
+
 };

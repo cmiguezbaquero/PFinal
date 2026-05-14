@@ -37,12 +37,16 @@
         <span class="nav-icon">◎</span>
         <span class="nav-label">Progress</span>
       </button>
+      <button class="nav-btn" onclick="showSection('profile')" data-section="profile">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-label">Profile</span>
+      </button>
     </nav>
 
     <div class="progress-section card">
       <p class="progress-label">Weekly goal</p>
       <div class="progress-bar">
-        <div id="progressFill"></div>
+        <div class="progress-fill"></div>
       </div>
       <p class="progress-stat"><strong id="sessionsDone">0</strong> sessions done</p>
     </div>
@@ -61,83 +65,248 @@
   <!-- ═══════════════════════════════════════
        MAIN
   ══════════════════════════════════════════ -->
-  <main class="main">
+    <main class="main">
 
-    <!-- ── DASHBOARD ── -->
-    <section id="dashboard" class="section active">
+      <!-- ═══════════════════════════════════════
+          DASHBOARD
+      ══════════════════════════════════════════ -->
+      <section id="dashboard" class="section active">
 
-      <div class="page-header">
-        <div>
-          <h2 id="welcomeText">Welcome back 👋</h2>
-          <p class="page-sub">Your week at a glance</p>
-        </div>
-        <span class="badge">This week</span>
-      </div>
-
-      <!-- Today highlight -->
-      <div class="highlight card">
-        <div class="highlight-inner">
-          <div class="highlight-text">
-            <p class="highlight-eyebrow">Today's focus</p>
-            <h3>Today's Workout</h3>
-            <p>Generate your goals to unlock a personalized plan.</p>
-          </div>
-          <button onclick="showSection('workouts')">View routine</button>
-        </div>
-      </div>
-
-      <!-- Week calendar — big day cards -->
-      <div class="week-grid-wrap">
-        <p class="section-label">This week</p>
-        <div class="week-grid" id="weekGrid" aria-label="Week view">
-          <!-- JS injects 7 × button.day-tile here -->
-        </div>
-      </div>
-
-      <!-- Day detail panel — slides open below the grid -->
-      <div id="dayDetail" class="day-detail-panel hidden">
-        <div class="day-detail-header">
+        <div class="page-header">
           <div>
-            <p class="day-detail-eyebrow">Scheduled exercises</p>
-            <h3 id="dayDetailTitle">Day</h3>
+            <h2 id="welcomeText">Welcome back 👋</h2>
+            <p class="page-sub">Your performance this week</p>
           </div>
-          <button class="close-btn" onclick="closeDayDetail()">✕</button>
-        </div>
-        <!-- JS fills this with .exercise-detail-card items -->
-        <div id="dayExercises" class="day-exercises-grid"></div>
-      </div>
 
-    </section>
-
-    <!-- ── WORKOUTS ── -->
-    <section id="workouts" class="section">
-      <div class="page-header">
-        <div>
-          <h2>Your Routine</h2>
-          <p class="page-sub">Drag to reorder · click to complete</p>
+          <button class="profile-btn" onclick="showSection('profile')">
+            ⚙ Profile
+          </button>
         </div>
-      </div>
-      <div class="grid" id="workoutList"></div>
-    </section>
 
-    <!-- ── PROGRESS ── -->
-    <section id="progress" class="section">
-      <div class="page-header">
-        <div>
-          <h2>Progress</h2>
-          <p class="page-sub">Track your consistency</p>
-        </div>
-      </div>
-      <div class="progress-detail-card card">
-        <p class="progress-detail-label">Sessions completed this week</p>
-        <h1 id="sessionsDoneDetail" class="progress-big-num">0</h1>
-        <div class="progress-bar large">
-          <div id="progressFill"></div>
-        </div>
-      </div>
-    </section>
+        <!-- =========================
+            WEEKLY COMPLIANCE
+        ========================== -->
+        <div class="compliance-grid">
 
-  </main>
+          <div class="compliance-card card">
+            <p class="stat-label">Weekly compliance</p>
+
+            <div class="compliance-circle">
+              <svg viewBox="0 0 120 120">
+                <circle class="circle-bg" cx="60" cy="60" r="52"></circle>
+                <circle id="complianceCircle"
+                        class="circle-progress"
+                        cx="60"
+                        cy="60"
+                        r="52"></circle>
+              </svg>
+
+              <div class="circle-center">
+                <span id="compliancePercent">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="weekly-stats">
+
+            <div class="mini-stat card">
+              <span class="mini-stat-num" id="completedSessions">0</span>
+              <span class="mini-stat-label">Completed</span>
+            </div>
+
+            <div class="mini-stat card">
+              <span class="mini-stat-num" id="plannedSessions">0</span>
+              <span class="mini-stat-label">Planned</span>
+            </div>
+
+            <div class="mini-stat card">
+              <span class="mini-stat-num" id="streakDays">0</span>
+              <span class="mini-stat-label">Streak</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- =========================
+            TODAY HIGHLIGHT
+        ========================== -->
+        <div class="highlight card">
+          <div class="highlight-inner">
+            <div class="highlight-text">
+              <p class="highlight-eyebrow">Today's focus</p>
+              <h3>Today's Workout</h3>
+              <p>Stay consistent and complete your routine.</p>
+            </div>
+
+            <button onclick="showSection('workouts')">
+              View routine
+            </button>
+          </div>
+        </div>
+
+        <!-- =========================
+            RECOMMENDATIONS
+        ========================== -->
+        <div class="recommend-section">
+
+          <div class="section-top">
+            <div>
+              <p class="section-label">AI Suggestions</p>
+              <h3 class="section-title">Recommended Exercises</h3>
+            </div>
+          </div>
+
+          <div id="recommendationsGrid" class="recommend-grid">
+            <!-- JS -->
+          </div>
+
+        </div>
+
+        <!-- =========================
+            WEEK GRID
+        ========================== -->
+        <div class="week-grid-wrap">
+          <p class="section-label">This week</p>
+
+          <div class="week-grid" id="weekGrid"></div>
+        </div>
+
+        <!-- =========================
+            DAY DETAIL
+        ========================== -->
+        <div id="dayDetail" class="day-detail-panel hidden">
+
+          <div class="day-detail-header">
+            <div>
+              <p class="day-detail-eyebrow">Workout Session</p>
+              <h3 id="dayDetailTitle">Day</h3>
+            </div>
+
+            <button class="close-btn" onclick="closeDayDetail()">✕</button>
+          </div>
+
+          <!-- Workout session stats -->
+          <div class="session-overview">
+
+            <div class="session-stat">
+              <span class="session-stat-num" id="sessionExercises">0</span>
+              <span class="session-stat-label">Exercises</span>
+            </div>
+
+            <div class="session-stat">
+              <span class="session-stat-num" id="sessionVolume">0</span>
+              <span class="session-stat-label">Volume</span>
+            </div>
+
+            <div class="session-stat">
+              <span class="session-stat-num" id="sessionSets">0</span>
+              <span class="session-stat-label">Sets</span>
+            </div>
+
+          </div>
+
+          <div id="dayExercises" class="day-exercises-grid"></div>
+
+        </div>
+
+      </section>
+
+      <!-- ═══════════════════════════════════════
+          WORKOUTS
+      ══════════════════════════════════════════ -->
+      <section id="workouts" class="section">
+
+        <div class="page-header">
+          <div>
+            <h2>Your Routine</h2>
+            <p class="page-sub">Detailed sessions</p>
+          </div>
+        </div>
+
+        <div id="workoutList" class="grid"></div>
+
+      </section>
+
+      <!-- ═══════════════════════════════════════
+          PROGRESS / HISTORY
+      ══════════════════════════════════════════ -->
+      <section id="progress" class="section">
+
+        <div class="page-header">
+          <div>
+            <h2>Progress History</h2>
+            <p class="page-sub">Your completed sessions</p>
+          </div>
+        </div>
+
+        <div class="progress-detail-card card">
+          <p class="progress-detail-label">Sessions completed this week</p>
+          <h1 id="sessionsDoneDetail" class="progress-big-num">0</h1>
+          <div class="progress-bar large">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+
+        <div id="historyList" class="history-list"></div>
+
+      </section>
+
+      <!-- ═══════════════════════════════════════
+          PROFILE
+      ══════════════════════════════════════════ -->
+      <section id="profile" class="section">
+
+        <div class="page-header">
+          <div>
+            <h2>Profile Settings</h2>
+            <p class="page-sub">Manage your account</p>
+          </div>
+        </div>
+
+        <div class="profile-grid">
+
+          <div class="profile-card card">
+
+            <h3>Edit profile</h3>
+
+            <form id="profileForm" class="profile-form">
+
+              <div class="form-group">
+                <label>Name</label>
+                <input id="profileName" type="text">
+              </div>
+
+              <div class="form-group">
+                <label>Email</label>
+                <input id="profileEmail" type="email">
+              </div>
+
+              <button type="submit">
+                Save changes
+              </button>
+
+            </form>
+
+          </div>
+
+          <div class="profile-card danger">
+
+            <h3>Danger Zone</h3>
+
+            <p>Delete your account permanently.</p>
+
+            <button class="danger-btn" onclick="deleteAccount()">
+              Delete account
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
 
   <!-- ═══════════════════════════════════════
        ADD EXERCISE DRAWER

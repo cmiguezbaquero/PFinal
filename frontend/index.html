@@ -47,9 +47,9 @@
    <h2>Create account</h2>
 
 
-   <input id="registerName" placeholder="Name">
-   <input id="registerEmail" type="email" placeholder="Email">
-   <input id="registerPassword" type="password" placeholder="Password">
+  <input id="registerName" placeholder="Name" required>
+  <input id="registerEmail" type="email" placeholder="Email" required pattern=".+@.+">
+  <input id="registerPassword" type="password" placeholder="Password" required>
 
 
    <button onclick="createUser()">Register</button>

@@ -3,6 +3,10 @@ import { setCurrentUser, getCurrentUser } from "./shared/session.js";
 
 const authAPI = API.auth;
 
+function isValidRegistrationEmail(email) {
+  return typeof email === "string" && email.includes("@");
+}
+
 /* =========================
    AUTO CHECK (SOLO REDIRECT SI YA LOGUEADO)
 ========================= */
@@ -74,13 +78,19 @@ async function createUser() {
     return;
   }
 
+  if (!isValidRegistrationEmail(emailInput.value.trim())) {
+    alert("El correo debe incluir @");
+    emailInput.focus();
+    return;
+  }
+
   try {
     const res = await fetch(`${authAPI}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: nameInput.value,
-        email: emailInput.value,
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
         password: passwordInput.value
       })
     });
