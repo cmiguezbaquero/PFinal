@@ -22,7 +22,7 @@ window._loadHistory = () => {
 };
 
 // ── Main loader ───────────────────────────────────────────────
-export async function loadHistory(userId) {
+async function loadHistory(userId) {
   const root = document.getElementById("historyRoot");
   if (!root) return;
 

@@ -23,7 +23,7 @@ window._loadRecommendations = () => {
 };
 
 // ── Main loader ───────────────────────────────────────────────
-export async function loadRecommendations(userId) {
+async function loadRecommendations(userId) {
   const root = document.getElementById("recommendationsRoot");
   if (!root) return;
 

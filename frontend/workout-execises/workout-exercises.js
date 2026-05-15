@@ -30,7 +30,7 @@ window._loadWorkoutExercises = () => {
 };
 
 // ── Main loader ───────────────────────────────────────────────
-export async function loadWorkoutExercises(userId) {
+async function loadWorkoutExercises(userId) {
   const root = document.getElementById("workoutExercisesRoot");
   if (!root) return;
 

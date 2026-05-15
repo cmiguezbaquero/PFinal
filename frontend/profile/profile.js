@@ -21,7 +21,7 @@ window._loadProfile = () => {
 };
 
 // ── Main loader ───────────────────────────────────────────────
-export async function loadProfile(userId) {
+async function loadProfile(userId) {
   const root = document.getElementById("profileRoot");
   if (!root) return;
 

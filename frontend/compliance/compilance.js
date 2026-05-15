@@ -24,7 +24,7 @@ window._loadCompliance = () => {
 };
 
 // ── Main loader ───────────────────────────────────────────────
-export async function loadCompliance(userId) {
+async function loadCompliance(userId) {
   const root = document.getElementById("complianceRoot");
   if (!root) return;
 

@@ -59,6 +59,8 @@ async function loadWorkouts(user) {
     let workouts = await res.json();
     if (!Array.isArray(workouts)) workouts = [];
 
+    // Limpiar localStorage si el servidor responde OK — evita duplicados
+    localStorage.removeItem(getLocalExercisesKey(user.id, weekStart));
     workouts = mergeLocalExercisesIntoWorkouts(user.id, weekStart, workouts);
 
     if (workouts.length === 0) {
