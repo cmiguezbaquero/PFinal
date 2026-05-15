@@ -1,0 +1,83 @@
+/* ── History ─────────────────────────────────────────────────── */
+.history-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+/* Stats row */
+.history-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.history-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px !important;
+  text-align: center;
+}
+.history-stat-icon { font-size: 18px; }
+.history-stat-num  { font-family: 'Clash Display', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
+.history-stat-lbl  { font-size: 10px; color: var(--h-muted); text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* Filter buttons */
+.history-filters { display: flex; gap: 8px; }
+.history-filter {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  border: 1px solid var(--h-border) !important;
+  color: var(--h-muted) !important;
+  animation: none !important;
+  box-shadow: none !important;
+  transition: all 180ms ease !important;
+}
+.history-filter:hover  { color: var(--h-text) !important; border-color: var(--h-border-hi) !important; transform: none !important; filter: none !important; }
+.history-filter.active { background: var(--h-grad-soft) !important; border-color: rgba(204,111,255,0.25) !important; color: var(--h-text) !important; }
+
+/* Session list */
+.history-list { display: flex; flex-direction: column; gap: 12px; }
+
+.history-card {
+  padding: 18px 20px !important;
+  transition: transform 180ms var(--ease-spring), border-color 180ms ease;
+}
+.history-card:hover { transform: translateY(-3px); border-color: var(--h-border-hi); }
+
+.history-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.history-card-date { font-size: 11px; color: var(--h-muted); text-transform: capitalize; margin: 0 0 3px; }
+.history-card-desc { font-weight: 600; font-size: 14px; color: var(--h-text); margin: 0; }
+.history-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.history-duration   { font-size: 11px; color: var(--h-muted); }
+
+.history-status-pill {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 999px;
+}
+.history-status-pill.done    { background: rgba(52,211,153,0.10); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.18); }
+.history-status-pill.pending { background: rgba(251,123,184,0.10); color: var(--h-p5); border: 1px solid rgba(251,123,184,0.20); }
+
+/* Exercise rows inside card */
+.history-ex-list { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; }
+.history-ex-row  { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.history-ex-name { font-size: 12px; color: var(--h-text); font-weight: 500; }
+.history-ex-meta { font-size: 11px; color: var(--h-muted); white-space: nowrap; }
+.history-ex-more { font-size: 11px; color: var(--h-faint); margin: 0; }
+
+.history-empty { padding: 28px !important; text-align: center; }
+.history-empty p { color: var(--h-muted); font-size: 13px; margin: 0; }
+
+@media (max-width: 700px) {
+  .history-stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 440px) {
+  .history-card-header { flex-direction: column; }
+  .history-card-right  { align-items: flex-start; }
+}
