@@ -4,42 +4,25 @@
    ============================================================ */
 
 /* ── Lighter palette overrides (home only) ─────────────────── */
-/* We layer brighter local vars on top of the dark index tokens */
 :root {
-  --h-bg:        #100a24;          /* slightly lighter deep bg   */
+  --h-bg:        #100a24;
   --h-surface:   rgba(255,255,255,0.055);
   --h-border:    rgba(200,170,255,0.13);
   --h-border-hi: rgba(200,130,255,0.32);
 
-.profile-btn {
-  padding: 10px 14px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  background: var(--h-surface) !important;
-  border: 1px solid var(--h-border) !important;
-  color: var(--h-text) !important;
-  box-shadow: none !important;
-  animation: none !important;
-}
-.profile-btn:hover {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: var(--h-border-hi) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: none !important;
-}
-  --h-p1: #cc6fff;   /* lavender — lighter version of --p1      */
-  --h-p2: #818cf8;   /* periwinkle — lighter --p2               */
-  --h-p3: #38bdf8;   /* sky — lighter --p3                      */
-  --h-p4: #fb7bb8;   /* rose — lighter --p4                     */
-  --h-p5: #fbb6e5;   /* petal                                   */
+  --h-p1: #cc6fff;
+  --h-p2: #818cf8;
+  --h-p3: #38bdf8;
+  --h-p4: #fb7bb8;
+  --h-p5: #fbb6e5;
 
   --h-grad:      linear-gradient(135deg, var(--h-p1) 0%, var(--h-p2) 45%, var(--h-p4) 100%);
   --h-grad-btn:  linear-gradient(135deg, var(--h-p4) 0%, var(--h-p1) 55%, var(--h-p2) 100%);
   --h-grad-soft: linear-gradient(135deg, rgba(204,111,255,0.14), rgba(129,140,248,0.10), rgba(251,123,184,0.12));
 
-.progress-bar.large .progress-fill { height: 100%; }
   --h-muted:     rgba(230,218,255,0.60);
   --h-faint:     rgba(230,218,255,0.28);
+  --h-text:      #f0eaff;
 
   --h-shadow:    0 20px 50px rgba(180,100,255,0.12), 0 6px 16px rgba(0,0,0,0.35);
   --h-glow:      0 0 36px rgba(204,111,255,0.22);
@@ -254,6 +237,24 @@
   filter: none !important;
 }
 
+/* Profile button (used in profile section) */
+.profile-btn {
+  padding: 10px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  background: var(--h-surface) !important;
+  border: 1px solid var(--h-border) !important;
+  color: var(--h-text) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+.profile-btn:hover {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: var(--h-border-hi) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: none !important;
+}
+
 /* ═══════════════════════════════════════════════════════════
    MAIN
 ═══════════════════════════════════════════════════════════ */
@@ -358,16 +359,14 @@
 
 .week-grid-wrap { margin-bottom: 10px; }
 
-/* 7 equal columns, each card is tall enough to show exercise previews */
 .week-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 12px;
 }
 
-/* ── Day tile — the big card ──────────────────────────────── */
+/* ── Day tile ──────────────────────────────────────────────── */
 .day-tile {
-  /* reset global button */
   animation: none !important;
   box-shadow: none !important;
   background: var(--h-surface) !important;
@@ -392,7 +391,6 @@
   overflow: hidden;
 }
 
-/* Subtle top shimmer on each card */
 .day-tile::before {
   content: '';
   position: absolute;
@@ -413,21 +411,18 @@
   filter: none !important;
 }
 
-/* Day tile — active (selected) */
 .day-tile.selected {
   border-color: var(--h-p1);
   background: rgba(204,111,255,0.10) !important;
   box-shadow: 0 0 0 1px rgba(204,111,255,0.30), 0 10px 28px rgba(180,100,255,0.18) !important;
 }
 
-/* Today highlight */
 .day-tile.today {
   border-color: rgba(251,123,184,0.40);
   background: rgba(251,123,184,0.06) !important;
 }
 .day-tile.today .day-tile-weekday { color: var(--h-p4); }
 
-/* Day tile header */
 .day-tile-header {
   display: flex;
   flex-direction: column;
@@ -451,12 +446,13 @@
   line-height: 1;
 }
 
-/* Exercise previews inside the tile */
 .day-tile-exercises {
   display: flex;
   flex-direction: column;
   gap: 5px;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .day-tile-ex {
@@ -469,6 +465,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
 }
 .day-tile-ex::before {
   content: '';
@@ -485,7 +483,6 @@
   margin-top: 2px;
 }
 
-/* Footer of the tile: status pill */
 .day-tile-footer {
   margin-top: 10px;
   display: flex;
@@ -551,14 +548,12 @@
   text-transform: capitalize;
 }
 
-/* Exercise detail cards grid */
 .day-exercises-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
 }
 
-/* Each exercise card inside the detail panel */
 .exercise-detail-card {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--h-border);
@@ -889,7 +884,6 @@
 /* =========================================================
    WEEKLY COMPLIANCE
 ========================================================= */
-
 .compliance-grid {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -955,7 +949,7 @@
 
 .weekly-stats {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 
@@ -980,7 +974,6 @@
 /* =========================================================
    RECOMMENDATIONS
 ========================================================= */
-
 .recommend-section {
   margin-bottom: 34px;
 }
@@ -996,7 +989,7 @@
 
 .recommend-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
 }
 
@@ -1035,10 +1028,9 @@
 /* =========================================================
    SESSION OVERVIEW
 ========================================================= */
-
 .session-overview {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   margin-bottom: 24px;
 }
@@ -1064,7 +1056,6 @@
 /* =========================================================
    HISTORY
 ========================================================= */
-
 .history-list {
   display: grid;
   gap: 14px;
@@ -1096,7 +1087,6 @@
 /* =========================================================
    PROFILE
 ========================================================= */
-
 .profile-grid {
   display: grid;
   grid-template-columns: 1fr 320px;
@@ -1122,13 +1112,12 @@
 }
 
 .danger-btn {
-  background: linear-gradient(135deg,#ff4d6d,#ff6b81) !important;
+  background: linear-gradient(135deg, #ff4d6d, #ff6b81) !important;
 }
 
 /* =========================================================
    GOALS
 ========================================================= */
-
 .goals-wrap {
   display: flex;
   flex-direction: column;
@@ -1237,7 +1226,6 @@
 /* =========================================================
    SETTINGS BUTTON & PREFERENCES PANEL
 ========================================================= */
-
 .settings-btn {
   width: 100%;
   padding: 11px 14px;
@@ -1266,23 +1254,36 @@
 
 .preferences-panel {
   position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 280px;
-  background: rgba(20,10,40,0.98);
-  backdrop-filter: blur(20px);
-  border-left: 1px solid var(--h-border);
-  padding: 20px;
+  right: 24px;
+  bottom: 80px;
+  width: 256px;
+  background: rgba(12,6,28,0.97);
+  backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(204,111,255,0.22);
+  border-radius: 20px;
+  padding: 20px 18px;
   overflow-y: auto;
   z-index: 1000;
-  animation: slideInRight 0.3s var(--ease-out) both;
-  box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+  animation: prefPop 0.25s var(--ease-spring) both;
+  box-shadow:
+    0 32px 64px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(204,111,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.07);
 }
 
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.preferences-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(204,111,255,0.4), transparent);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+@keyframes prefPop {
+  from { transform: translateY(10px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);    opacity: 1; }
 }
 
 .preferences-panel.hidden {
@@ -1365,49 +1366,191 @@
 }
 
 /* =========================================================
-   LIGHT THEME (Optional - si se selecciona tema claro)
+   LIGHT THEME — todos los efectos del oscuro adaptados
 ========================================================= */
-
 html.light-theme {
-  --h-bg: #f8f9fa;
-  --h-surface: rgba(255,255,255,0.95);
-  --h-border: rgba(0,0,0,0.08);
-  --h-border-hi: rgba(0,0,0,0.15);
+  /* Colores base claros */
+  --h-bg:        #f0ecfa;
+  --h-surface:   rgba(255,255,255,0.85);
+  --h-border:    rgba(160,100,255,0.15);
+  --h-border-hi: rgba(160,80,255,0.35);
+  --h-text:      #1a1030;
+  --h-muted:     rgba(40,20,80,0.58);
+  --h-faint:     rgba(40,20,80,0.32);
 
-  --h-text: #1a1a2e;
-  --h-muted: rgba(26,26,46,0.60);
-  --h-faint: rgba(26,26,46,0.35);
+  /* Gradientes igual que oscuro */
+  --h-grad:      linear-gradient(135deg, #9d3fff 0%, #6366f1 45%, #e8529a 100%);
+  --h-grad-btn:  linear-gradient(135deg, #e8529a 0%, #9d3fff 55%, #6366f1 100%);
+  --h-grad-soft: linear-gradient(135deg, rgba(157,63,255,0.12), rgba(99,102,241,0.09), rgba(232,82,154,0.10));
 
-  --h-grad: linear-gradient(135deg, #cc6fff 0%, #818cf8 45%, #fb7bb8 100%);
-  --h-grad-soft: linear-gradient(135deg, rgba(204,111,255,0.14), rgba(129,140,248,0.10), rgba(251,123,184,0.12));
+  /* Sombras adaptadas a fondo claro */
+  --h-shadow:    0 20px 50px rgba(140,60,255,0.14), 0 6px 16px rgba(0,0,0,0.08);
+  --h-glow:      0 0 36px rgba(157,63,255,0.18);
 }
 
+/* Fondo con gradiente animado (igual que oscuro, colores claros) */
+html.light-theme body::before {
+  background:
+    radial-gradient(ellipse 900px 700px at -10% -10%, rgba(157,63,255,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 110% 110%, rgba(232,82,154,0.09), transparent 60%),
+    radial-gradient(ellipse 500px 600px at 50% 50%,  rgba(99,102,241,0.07), transparent 70%),
+    radial-gradient(ellipse 400px 300px at 80% 10%,  rgba(6,182,212,0.05),  transparent 60%),
+    #ece8f8;
+}
+
+/* Sidebar */
 html.light-theme .left-panel {
-  background: rgba(255,255,255,0.95);
-  border-right-color: rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.80);
+  backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(160,100,255,0.12);
 }
 
+/* Cards — fondo blanco semitransparente + shimmer top */
+html.light-theme .card,
+html.light-theme .panel {
+  background: rgba(255,255,255,0.80) !important;
+  border-color: rgba(160,100,255,0.14) !important;
+  box-shadow: 0 12px 40px rgba(140,60,255,0.10), 0 4px 12px rgba(0,0,0,0.06) !important;
+}
+html.light-theme .card:hover,
+html.light-theme .panel:hover {
+  box-shadow: 0 20px 56px rgba(140,60,255,0.16), 0 0 36px rgba(157,63,255,0.12) !important;
+}
+
+/* Day tiles */
 html.light-theme .day-tile {
-  background: white !important;
-  border-color: rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.75) !important;
+  border-color: rgba(160,100,255,0.13) !important;
+  box-shadow: none !important;
+}
+html.light-theme .day-tile:hover {
+  background: rgba(204,111,255,0.06) !important;
+  border-color: rgba(160,80,255,0.30) !important;
+  box-shadow: 0 10px 30px rgba(140,60,255,0.12) !important;
+}
+html.light-theme .day-tile.today {
+  background: rgba(232,82,154,0.05) !important;
+  border-color: rgba(232,82,154,0.30) !important;
+}
+html.light-theme .day-tile.selected {
+  background: rgba(157,63,255,0.07) !important;
+  border-color: rgba(157,63,255,0.35) !important;
+  box-shadow: 0 0 0 1px rgba(157,63,255,0.20), 0 10px 28px rgba(140,60,255,0.12) !important;
 }
 
-html.light-theme .card {
-  background: white !important;
-  border-color: rgba(0,0,0,0.08) !important;
+/* Exercise detail cards */
+html.light-theme .exercise-detail-card {
+  background: rgba(255,255,255,0.65);
+  border-color: rgba(160,100,255,0.13);
+}
+html.light-theme .exercise-detail-card:hover {
+  background: rgba(204,111,255,0.06);
+  border-color: rgba(160,80,255,0.28);
 }
 
+/* Inputs */
 html.light-theme input,
-html.light-theme select {
-  background: rgba(0,0,0,0.03) !important;
+html.light-theme select,
+html.light-theme textarea {
+  background: rgba(255,255,255,0.70) !important;
+  border-color: rgba(160,100,255,0.15) !important;
+  color: #1a1030 !important;
+}
+html.light-theme input:focus,
+html.light-theme select:focus {
+  border-color: rgba(157,63,255,0.45) !important;
+  background: rgba(255,255,255,0.90) !important;
+  box-shadow: 0 0 0 3px rgba(157,63,255,0.10) !important;
+}
+
+/* Nav buttons */
+html.light-theme .nav-btn {
+  color: rgba(40,20,80,0.55);
+}
+html.light-theme .nav-btn:hover {
+  background: rgba(157,63,255,0.07);
+  color: #1a1030;
+}
+html.light-theme .nav-btn.active {
+  background: var(--h-grad-soft);
+  border-color: rgba(157,63,255,0.20);
+  color: #1a1030;
+}
+
+/* Progress bar */
+html.light-theme .progress-bar {
+  background: rgba(0,0,0,0.06);
+}
+
+/* Status pills */
+html.light-theme .day-tile-status.pending {
+  background: rgba(232,82,154,0.09);
+  border-color: rgba(232,82,154,0.20);
+}
+html.light-theme .day-tile-status.empty {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(40,20,80,0.35);
+}
+
+/* Preferences panel */
+html.light-theme .preferences-panel {
+  background: rgba(248,244,255,0.97);
+  border-color: rgba(160,100,255,0.20);
+  box-shadow: 0 32px 64px rgba(0,0,0,0.14), 0 0 0 1px rgba(157,63,255,0.08);
+}
+
+/* Highlight card */
+html.light-theme .highlight {
+  background: linear-gradient(135deg,
+    rgba(157,63,255,0.08) 0%,
+    rgba(99,102,241,0.06) 50%,
+    rgba(232,82,154,0.07) 100%) !important;
+  border-color: rgba(157,63,255,0.18) !important;
+}
+
+/* Drawer */
+html.light-theme .right-panel {
+  background: rgba(255,255,255,0.85);
+  border-left-color: rgba(160,100,255,0.12);
+}
+html.light-theme .drawer-card {
+  background: rgba(255,255,255,0.85) !important;
+  border-color: rgba(160,100,255,0.12) !important;
+}
+
+/* Sidebar actions */
+html.light-theme .logout-btn {
   border-color: rgba(0,0,0,0.08) !important;
-  color: #1a1a2e !important;
+  color: rgba(40,20,80,0.55) !important;
+}
+html.light-theme .logout-btn:hover {
+  color: #1a1030 !important;
+  background: rgba(0,0,0,0.04) !important;
+}
+html.light-theme .settings-btn {
+  background: rgba(255,255,255,0.60) !important;
+  border-color: rgba(160,100,255,0.15) !important;
+  color: #1a1030 !important;
+}
+
+/* Progress mini cards */
+html.light-theme .progress-mini-card {
+  background: rgba(255,255,255,0.60);
+  border-color: rgba(160,100,255,0.12);
+}
+
+/* Scrollbar en claro */
+html.light-theme ::-webkit-scrollbar-thumb {
+  background: rgba(157,63,255,0.20);
+}
+html.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(157,63,255,0.35);
 }
 
 /* =========================================================
-   VIEW MODES (Horizontal vs Calendar)
+   VIEW MODES
 ========================================================= */
-
 html.view-horizontal .week-grid {
   grid-template-columns: 1fr;
   gap: 8px;
