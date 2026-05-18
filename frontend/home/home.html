@@ -93,30 +93,6 @@
       </button>
     </div>
 
-    <!-- Preferences Panel -->
-    <div id="preferencesPanel" class="preferences-panel hidden">
-      <div class="preferences-header">
-        <h3>Preferencias</h3>
-        <button class="close-btn" onclick="togglePreferencesPanel()">✕</button>
-      </div>
-
-      <div class="preferences-group">
-        <label>Tema</label>
-        <div class="toggle-group">
-          <button class="toggle-btn" data-theme="dark" onclick="window.preferences.set({theme: 'dark'})">🌙 Oscuro</button>
-          <button class="toggle-btn" data-theme="light" onclick="window.preferences.set({theme: 'light'})">☀️ Claro</button>
-        </div>
-      </div>
-
-      <div class="preferences-group">
-        <label>Vista</label>
-        <div class="toggle-group">
-          <button class="toggle-btn" data-view="calendar" onclick="window.preferences.set({viewMode: 'calendar'})">📅 Calendario</button>
-          <button class="toggle-btn" data-view="horizontal" onclick="window.preferences.set({viewMode: 'horizontal'})">➡️ Horizontal</button>
-        </div>
-      </div>
-    </div>
-
   </aside>
 
   <!-- ═══════════════════════════════════════
@@ -287,6 +263,30 @@
     </div>
   </aside>
 
+</div>
+
+<!-- Preferences Panel — fuera del layout para que position:fixed funcione correctamente -->
+<div id="preferencesPanel" class="preferences-panel hidden">
+  <div class="preferences-header">
+    <h3>Preferencias</h3>
+    <button class="close-btn" onclick="togglePreferencesPanel()">✕</button>
+  </div>
+
+  <div class="preferences-group">
+    <label>Tema</label>
+    <div class="toggle-group">
+      <button class="toggle-btn" data-theme="dark" onclick="window.preferences.set({theme: 'dark'})">🌙 Oscuro</button>
+      <button class="toggle-btn" data-theme="light" onclick="window.preferences.set({theme: 'light'})">☀️ Claro</button>
+    </div>
+  </div>
+
+  <div class="preferences-group">
+    <label>Vista</label>
+    <div class="toggle-group">
+      <button class="toggle-btn" data-view="calendar" onclick="window.preferences.set({viewMode: 'calendar'})">📅 Calendario</button>
+      <button class="toggle-btn" data-view="horizontal" onclick="window.preferences.set({viewMode: 'horizontal'})">➡️ Horizontal</button>
+    </div>
+  </div>
 </div>
 
 <!-- ── Core logic ── -->
