@@ -1,6 +1,6 @@
 import { clearCurrentUser, getCurrentUser } from "../shared/session.js";
 import { getWeekStartISO } from "../shared/date.js";
-import { getWeeklyWorkouts, toggleWorkoutCompletion, createExercise, addWorkoutExercise } from "../shared/api.js";
+import { getWeeklyWorkouts, toggleWorkoutCompletion, addWorkoutExercise } from "../shared/api.js";
 
 /* =========================
    INIT
@@ -342,29 +342,50 @@ document.getElementById("addExerciseForm")?.addEventListener("submit", async (e)
   if (!user) { alert("User not found"); return; }
 
   try {
+    // Get the day selected and find the corresponding workout
+    const selectedDay = data.day;
+    const weekStart = getWeekStartISO();
+
+    const workoutsRes = await getWeeklyWorkouts(user.id, weekStart);
+    if (!workoutsRes.ok) {
+      alert("Could not load workouts for the selected day");
+      return;
+    }
+
+    const workouts = await workoutsRes.json();
+    const workout = workouts.find(w => w.plannedDate === selectedDay);
+
+    if (!workout) {
+      alert("No workout found for the selected day. Please generate a routine first.");
+      return;
+    }
+
+    // Now add the exercise to this workout using addWorkoutExercise
     const payload = {
-      name:        data.name,
-      sets:        Number(data.sets)  || 3,
-      reps:        Number(data.reps)  || 10,
-      plannedDate: data.day,
-      userId:      user.id
+      workoutId:  workout.id,
+      exerciseId: null,  // null = create new exercise or find by name
+      name:       data.name,
+      sets:       Number(data.sets)   || 3,
+      reps:       Number(data.reps)   || 10,
+      weight:     0,
+      notes:      "",
+      userId:     user.id
     };
 
-    try {
-      const res = await createExercise(payload);
-      if (!res.ok) {
-        saveLocalExercise(user.id, getWeekStartISO(), payload);
-      }
-    } catch {
-      saveLocalExercise(user.id, getWeekStartISO(), payload);
+    const res = await addWorkoutExercise(payload);
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Error adding exercise:", errorText);
+      alert("Error adding exercise: " + errorText);
+      return;
     }
 
     hideAddExercise();
+    form.reset();
     await loadWorkouts(user);
   } catch (err) {
     console.error(err);
-    hideAddExercise();
-    await loadWorkouts(user);
+    alert("Error: " + err.message);
   }
 });
 
