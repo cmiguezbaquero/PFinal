@@ -25,13 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 ========================= */
 
 /* =========================
-   CALENDAR
-========================= */
-function loadCalendar() {
-  // kept for backward compatibility
-}
-
-/* =========================
    WORKOUTS
 ========================= */
 let draggedItem = null;
@@ -51,7 +44,7 @@ async function loadWorkouts(user) {
       const localWorkouts = buildWorkoutsFromLocal(user.id, weekStart);
       renderWorkouts(container, localWorkouts);
       renderDashboardSummary(localWorkouts);
-      updateProgress(localWorkouts.filter(w => w.completed).length, localWorkouts.length);
+      updateProgress(localWorkouts);
       renderWeekTilesFromWorkouts(localWorkouts);
       return;
     }
@@ -66,13 +59,13 @@ async function loadWorkouts(user) {
     if (workouts.length === 0) {
       renderEmptyRoutine(container);
       renderDashboardSummary(null);
-      updateProgress(0, 0);
+      updateProgress([]);
       return;
     }
 
     renderWorkouts(container, workouts);
     renderDashboardSummary(workouts);
-    updateProgress(workouts.filter(w => w.completed).length, workouts.length);
+    updateProgress(workouts);
     renderWeekTilesFromWorkouts(workouts);
   } catch (error) {
     console.error(error);
@@ -80,12 +73,12 @@ async function loadWorkouts(user) {
     if (!localWorkouts || localWorkouts.length === 0) {
       renderEmptyRoutine(container);
       renderDashboardSummary(null);
-      updateProgress(0, 0);
+      updateProgress([]);
       return;
     }
     renderWorkouts(container, localWorkouts);
     renderDashboardSummary(localWorkouts);
-    updateProgress(localWorkouts.filter(w => w.completed).length, localWorkouts.length);
+    updateProgress(localWorkouts);
     renderWeekTilesFromWorkouts(localWorkouts);
   }
 }
@@ -474,12 +467,28 @@ function renderExercises(exercises) {
   }).join("");
 }
 
-function updateProgress(done, total) {
+function updateProgress(workouts) {
+  const list = Array.isArray(workouts) ? workouts : [];
+  const done = list.filter(w => w.completed).length;
+  const total = list.length;
+  const exercisesTotal = list.reduce((sum, workout) => sum + (workout.exercises?.length || 0), 0);
   const sessionsDone = document.getElementById("sessionsDone");
-  const fills        = document.querySelectorAll("#progressFill");
+  const sessionsPlanned = document.getElementById("sessionsPlannedDetail");
+  const exercisesDone = document.getElementById("exercisesDoneDetail");
+  const progressPercent = document.getElementById("progressPercentDetail");
+  const summaryText = document.getElementById("progressSummaryText");
+  const fills        = document.querySelectorAll(".progress-fill");
   const pct          = total > 0 ? Math.round((done / total) * 100) : 0;
 
   if (sessionsDone) sessionsDone.innerText = String(done);
+  if (sessionsPlanned) sessionsPlanned.innerText = String(total);
+  if (exercisesDone) exercisesDone.innerText = String(exercisesTotal);
+  if (progressPercent) progressPercent.innerText = `${pct}%`;
+  if (summaryText) {
+    summaryText.innerText = total > 0
+      ? `${done} de ${total} sesiones completadas`
+      : "Aún no hay sesiones esta semana";
+  }
   fills.forEach(f => { f.style.width = `${pct}%`; });
 
   const detail = document.getElementById("sessionsDoneDetail");

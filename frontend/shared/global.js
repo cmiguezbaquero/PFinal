@@ -18,9 +18,7 @@ function showSection(id) {
   });
 
   // Lazy-load cada feature la primera vez que se abre su sección
-  if (id === "compliance"         && window._loadCompliance)        window._loadCompliance();
   if (id === "recommendations"    && window._loadRecommendations)   window._loadRecommendations();
-  if (id === "history"            && window._loadHistory)           window._loadHistory();
   if (id === "workout-exercises"  && window._loadWorkoutExercises)  window._loadWorkoutExercises();
   if (id === "profile"            && window._loadProfile)           window._loadProfile();
 }

@@ -12,11 +12,10 @@
   <link rel="stylesheet" href="../index.css">
   <link rel="stylesheet" href="home.css">
 
-  <!-- Feature styles -->
-  <link rel="stylesheet" href="../compliance/compliance.css">
-  <link rel="stylesheet" href="../recommendations/recommendations.css">
+   <!-- Feature styles -->
+   <link rel="stylesheet" href="../recommendations/recommendations.css">
   <link rel="stylesheet" href="../history/history.css">
-  <link rel="stylesheet" href="../workout-exercises/workout-exercises.css">
+  <link rel="stylesheet" href="../workout-execises/workout-exercises.css">
   <link rel="stylesheet" href="../profile/profile.css">
 
   <!--
@@ -52,27 +51,18 @@
         <span class="nav-label">Workouts</span>
       </button>
 
-      <button class="nav-btn" onclick="showSection('workout-exercises')" data-section="workout-exercises">
-        <span class="nav-icon">🏋</span>
-        <span class="nav-label">Ejercicios</span>
-      </button>
+       <button class="nav-btn" onclick="showSection('workout-exercises')" data-section="workout-exercises">
+         <span class="nav-icon">🏋</span>
+         <span class="nav-label">Ejercicios</span>
+       </button>
 
-      <button class="nav-btn" onclick="showSection('compliance')" data-section="compliance">
-        <span class="nav-icon">📊</span>
-        <span class="nav-label">Cumplimiento</span>
-      </button>
 
-      <button class="nav-btn" onclick="showSection('recommendations')" data-section="recommendations">
-        <span class="nav-icon">✦</span>
-        <span class="nav-label">Para ti</span>
-      </button>
+       <button class="nav-btn" onclick="showSection('recommendations')" data-section="recommendations">
+         <span class="nav-icon">✦</span>
+         <span class="nav-label">Para ti</span>
+       </button>
 
-      <button class="nav-btn" onclick="showSection('history')" data-section="history">
-        <span class="nav-icon">◎</span>
-        <span class="nav-label">Historial</span>
-      </button>
-
-      <button class="nav-btn" onclick="showSection('progress')" data-section="progress">
+       <button class="nav-btn" onclick="showSection('progress')" data-section="progress">
         <span class="nav-icon">↑</span>
         <span class="nav-label">Progreso</span>
       </button>
@@ -87,7 +77,7 @@
     <div class="progress-section card">
       <p class="progress-label">Weekly goal</p>
       <div class="progress-bar">
-        <div id="progressFill"></div>
+        <div class="progress-fill"></div>
       </div>
       <p class="progress-stat"><strong id="sessionsDone">0</strong> sessions done</p>
     </div>
@@ -159,29 +149,18 @@
       <div class="grid" id="workoutList"></div>
     </section>
 
-    <!-- ── WORKOUT EXERCISES ── -->
-    <section id="workout-exercises" class="section">
-      <div class="page-header">
-        <div>
-          <h2>Ejercicios por sesión</h2>
-          <p class="page-sub">Gestiona series, repeticiones y peso de cada ejercicio</p>
-        </div>
-      </div>
-      <div id="workoutExercisesRoot"></div>
-    </section>
+     <!-- ── WORKOUT EXERCISES ── -->
+     <section id="workout-exercises" class="section">
+       <div class="page-header">
+         <div>
+           <h2>Ejercicios por sesión</h2>
+           <p class="page-sub">Gestiona series, repeticiones y peso de cada ejercicio</p>
+         </div>
+       </div>
+       <div id="workoutExercisesRoot"></div>
+     </section>
 
-    <!-- ── COMPLIANCE ── -->
-    <section id="compliance" class="section">
-      <div class="page-header">
-        <div>
-          <h2>Cumplimiento semanal</h2>
-          <p class="page-sub">Tu constancia esta semana</p>
-        </div>
-      </div>
-      <div id="complianceRoot"></div>
-    </section>
-
-    <!-- ── RECOMMENDATIONS ── -->
+     <!-- ── RECOMMENDATIONS ── -->
     <section id="recommendations" class="section">
       <div class="page-header">
         <div>
@@ -189,33 +168,39 @@
           <p class="page-sub">Ejercicios personalizados para ti</p>
         </div>
       </div>
-      <div id="recommendationsRoot"></div>
-    </section>
+       <div id="recommendationsRoot"></div>
+     </section>
 
-    <!-- ── HISTORY ── -->
-    <section id="history" class="section">
-      <div class="page-header">
-        <div>
-          <h2>Historial</h2>
-          <p class="page-sub">Todas tus sesiones de entrenamiento</p>
-        </div>
-      </div>
-      <div id="historyRoot"></div>
-    </section>
-
-    <!-- ── PROGRESS ── -->
+     <!-- ── PROGRESS ── -->
     <section id="progress" class="section">
       <div class="page-header">
         <div>
-          <h2>Progress</h2>
-          <p class="page-sub">Track your consistency</p>
+          <h2>Progreso</h2>
+          <p class="page-sub">Resumen real de tu semana</p>
         </div>
       </div>
       <div class="progress-detail-card card">
-        <p class="progress-detail-label">Sessions completed this week</p>
+        <p class="progress-detail-label">Sesiones completadas esta semana</p>
         <h1 id="sessionsDoneDetail" class="progress-big-num">0</h1>
+        <p id="progressSummaryText" class="progress-summary-text">0 de 0 sesiones</p>
+
+        <div class="progress-stats-grid">
+          <div class="progress-mini-card">
+            <strong id="sessionsPlannedDetail">0</strong>
+            <span>Sesiones planificadas</span>
+          </div>
+          <div class="progress-mini-card">
+            <strong id="exercisesDoneDetail">0</strong>
+            <span>Ejercicios programados</span>
+          </div>
+          <div class="progress-mini-card">
+            <strong id="progressPercentDetail">0%</strong>
+            <span>Progreso total</span>
+          </div>
+        </div>
+
         <div class="progress-bar large">
-          <div id="progressFill"></div>
+          <div class="progress-fill"></div>
         </div>
       </div>
     </section>
@@ -247,23 +232,23 @@
       <form id="addExerciseForm" class="drawer-form">
 
         <div class="form-group">
-          <label class="form-label">Exercise name</label>
-          <input name="name" placeholder="e.g. Bench press" required />
+          <label class="form-label" for="addExerciseName">Exercise name</label>
+          <input id="addExerciseName" name="name" placeholder="e.g. Bench press" required />
         </div>
 
         <div class="drawer-row">
           <div class="form-group">
-            <label class="form-label">Sets</label>
-            <input name="sets" type="number" min="1" value="3" />
+            <label class="form-label" for="addExerciseSets">Sets</label>
+            <input id="addExerciseSets" name="sets" type="number" min="1" value="3" />
           </div>
           <div class="form-group">
-            <label class="form-label">Reps</label>
-            <input name="reps" type="number" min="1" value="10" />
+            <label class="form-label" for="addExerciseReps">Reps</label>
+            <input id="addExerciseReps" name="reps" type="number" min="1" value="10" />
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Day</label>
+          <label class="form-label" for="addExerciseDay">Day</label>
           <select name="day" id="addExerciseDay"></select>
         </div>
 
@@ -282,10 +267,8 @@
 <script type="module" src="home.js"></script>
 
 <!-- ── Feature modules — registran window._load* para lazy loading ── -->
-<script type="module" src="../compliance/compliance.js"></script>
-<script type="module" src="../recommendations/recommendations.js"></script>
-<script type="module" src="../history/history.js"></script>
-<script type="module" src="../workout-exercises/workout-exercises.js"></script>
+<script type="module" src="../recommendations/recommendations.js">
+<script type="module" src="../workout-execises/workout-exercises.js"></script>
 <script type="module" src="../profile/profile.js"></script>
 
 </body>

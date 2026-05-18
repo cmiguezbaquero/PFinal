@@ -39,11 +39,14 @@ async function loadHistory(userId) {
     let sessions = await res.json();
     if (!Array.isArray(sessions)) sessions = [];
 
-    // Sort newest first
-    sessions.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
+     // Sort newest first
+     sessions.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
 
-    root.innerHTML = renderHistory(sessions);
-    attachFilters(sessions);
+     // Keep only last 10 sessions
+     const recentSessions = sessions.slice(0, 10);
+
+     root.innerHTML = renderHistory(recentSessions);
+     attachFilters(recentSessions);
   } catch (err) {
     console.error("[history] fetch error:", err);
     root.innerHTML = renderError("Error de conexión con el servidor.");

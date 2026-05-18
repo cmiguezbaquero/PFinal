@@ -1,76 +1,144 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
- <meta charset="UTF-8">
- <title>FitPlan - Goals</title>
-
-
- <link rel="stylesheet" href="../index.css">
+  <meta charset="UTF-8">
+  <title>FitPlan - Configura tus objetivos</title>
+  <link rel="stylesheet" href="../index.css">
 </head>
-
-
 <body>
 
-
 <div class="auth-wrapper">
+  <h1 class="logo">FITPLAN</h1>
+  <p class="subtitle">Configura tus objetivos para una mejor experiencia</p>
 
+  <div class="card">
+    <form id="goalsForm" class="goals-form" novalidate>
 
- <h1 class="logo">FITPLAN</h1>
- <p class="subtitle">Configura tus objetivos</p>
+      <div class="form-group">
+        <label for="goalType">¿Cuál es tu objetivo?</label>
+        <select id="goalType" name="type" required>
+          <option value="">Selecciona un objetivo</option>
+          <option value="PERDER_PESO">Perder peso</option>
+          <option value="GANAR_MUSCULO">Ganar músculo</option>
+          <option value="MANTENER_FORMA">Mantener forma</option>
+        </select>
+      </div>
 
+      <div class="form-group">
+        <label for="trainingDays">¿Cuántos días por semana quieres entrenar?</label>
+        <input
+          type="number"
+          id="trainingDays"
+          name="trainingDays"
+          min="1"
+          max="7"
+          placeholder="Ej: 3"
+          required
+        />
+      </div>
 
- <div class="card">
-   <form id="goalsForm" class="goals-form" novalidate>
+      <div class="form-group">
+        <label for="levelInput">¿Cuál es tu nivel?</label>
+        <select id="levelInput" name="level" required>
+          <option value="">Selecciona tu nivel</option>
+          <option value="PRINCIPIANTE">Principiante</option>
+          <option value="INTERMEDIO">Intermedio</option>
+          <option value="AVANZADO">Avanzado</option>
+        </select>
+      </div>
 
+      <div class="form-actions">
+        <button type="submit" id="submitBtn">Generar mi rutina</button>
+      </div>
 
-     <div class="form-group">
-       <label for="type">Objetivo</label>
-       <select id="type" name="type">
-         <option value="PERDER_PESO">Perder peso</option>
-         <option value="GANAR_MUSCULO">Ganar músculo</option>
-         <option value="MANTENER_FORMA">Mantener</option>
-       </select>
-     </div>
-
-
-     <div class="form-group">
-       <label for="days">Días por semana</label>
-       <input
-         type="number"
-         id="days"
-         name="days"
-         min="1"
-         max="7"
-         placeholder="Ej: 3"
-         required
-       />
-     </div>
-
-
-     <div class="form-group">
-       <label for="level">Nivel</label>
-       <select id="level" name="level">
-         <option value="PRINCIPIANTE">Principiante</option>
-         <option value="INTERMEDIO">Intermedio</option>
-         <option value="AVANZADO">Avanzado</option>
-       </select>
-     </div>
-
-
-     <div class="form-actions">
-       <button id="saveGoalBtn" type="submit">Guardar objetivos</button>
-     </div>
-
-
-   </form>
- </div>
-
+    </form>
+    <div id="goalsMessage" style="margin-top: 15px;"></div>
+  </div>
 
 </div>
 
+<script type="module">
+  import { getCurrentUser, setCurrentUser } from "../shared/session.js";
+  import { updateGoals, generateWeeklyRoutine } from "../shared/api.js";
+  import { getWeekStartISO } from "../shared/date.js";
 
-<script type="module" src="goals.js"></script>
+  console.log("[goals.html] Página cargada");
 
+  // Verificar si está logueado
+  const user = getCurrentUser();
+  if (!user) {
+    console.warn("[goals.html] No hay usuario, redirigiendo a login");
+    window.location.href = "../index.html";
+  }
+
+  const form = document.getElementById("goalsForm");
+  const msgEl = document.getElementById("goalsMessage");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("[goals.html] Submit disparado");
+
+    const goalType = document.getElementById("goalType").value;
+    const trainingDays = document.getElementById("trainingDays").value;
+    const level = document.getElementById("levelInput").value;
+
+    if (!goalType || !trainingDays || !level) {
+      msgEl.innerHTML = '<p class="goals-message error">Por favor completa todos los campos</p>';
+      return;
+    }
+
+    const parsedDays = parseInt(trainingDays, 10);
+    if (isNaN(parsedDays) || parsedDays < 1 || parsedDays > 7) {
+      msgEl.innerHTML = '<p class="goals-message error">Los días deben estar entre 1 y 7</p>';
+      return;
+    }
+
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Guardando...";
+
+      console.log("[goals.html] Enviando objetivos...");
+      const res = await updateGoals(user.id, {
+        goalType,
+        trainingDaysPerWeek: parsedDays,
+        level
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        console.error("[goals.html] Error:", err);
+        msgEl.innerHTML = '<p class="goals-message error">Error al guardar: ' + res.status + '</p>';
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Generar mi rutina";
+        return;
+      }
+
+      const updatedUser = await res.json();
+      setCurrentUser(updatedUser);
+      console.log("[goals.html] Objetivos guardados");
+
+      // Generar rutina
+      console.log("[goals.html] Generando rutina...");
+      const routRes = await generateWeeklyRoutine(user.id, getWeekStartISO());
+      console.log("[goals.html] Rutina response:", routRes.status);
+
+      msgEl.innerHTML = '<p class="goals-message success">✓ Objetivos configurados. Redirigiendo al dashboard...</p>';
+
+      // Ir al dashboard
+      setTimeout(() => {
+        console.log("[goals.html] Redirigiendo a home");
+        window.location.href = "../home/home.html";
+      }, 2000);
+    } catch (err) {
+      console.error("[goals.html] Error:", err);
+      msgEl.innerHTML = '<p class="goals-message error">Error: ' + err.message + '</p>';
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Generar mi rutina";
+    }
+  });
+</script>
 
 </body>
 </html>
+

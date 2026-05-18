@@ -87,7 +87,7 @@ async function loginUser(event) {
     setCurrentUser(user);
 
     window.location.href = user.hasGoals
-      ? "../index.html"
+      ? "../home/home.html"
       : "../goals/goals.html";
   } catch (error) {
     console.error("Error de red en login", error);
