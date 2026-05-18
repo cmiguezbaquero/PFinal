@@ -347,22 +347,13 @@ document.getElementById("addExerciseForm")?.addEventListener("submit", async (e)
     const weekStart = getWeekStartISO();
 
     const workoutsRes = await getWeeklyWorkouts(user.id, weekStart);
-    if (!workoutsRes.ok) {
-      alert("Could not load workouts for the selected day");
-      return;
-    }
-
-    const workouts = await workoutsRes.json();
+    const workouts = workoutsRes.ok ? await workoutsRes.json() : [];
     const workout = workouts.find(w => w.plannedDate === selectedDay);
-
-    if (!workout) {
-      alert("No workout found for the selected day. Please generate a routine first.");
-      return;
-    }
 
     // Now add the exercise to this workout using addWorkoutExercise
     const payload = {
-      workoutId:  workout.id,
+      workoutId:  workout?.id ?? null,
+      plannedDate: selectedDay,
       exerciseId: null,  // null = create new exercise or find by name
       name:       data.name,
       sets:       Number(data.sets)   || 3,
@@ -396,7 +387,7 @@ function renderEmptyRoutine(container) {
   container.innerHTML = `
     <div class="card" style="grid-column: 1 / -1; padding: 28px;">
       <h3 style="margin:0 0 8px;">No routine generated yet</h3>
-      <p style="opacity:0.6; margin:0;">Save your goals to create a personalized plan.</p>
+      <p style="opacity:0.6; margin:0;">Save your goals to create a personalized plan. You can still add a custom session from the drawer.</p>
     </div>
   `;
 }

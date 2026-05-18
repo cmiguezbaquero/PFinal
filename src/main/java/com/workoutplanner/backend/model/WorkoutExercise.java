@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "workout_exercises")
+@Table(name = "workout_exercises", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"workout_id", "exercise_id"})
+})
 public class WorkoutExercise {
 
     @Id

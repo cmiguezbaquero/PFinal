@@ -1,9 +1,12 @@
 package com.workoutplanner.backend.dto;
 
+import java.time.LocalDate;
+
 public class WorkoutExerciseRequest {
     private Long workoutId;
     private Long exerciseId;
     private String name;
+    private LocalDate plannedDate;
     private int sets;
     private int reps;
     private double weight;
@@ -13,10 +16,11 @@ public class WorkoutExerciseRequest {
     public WorkoutExerciseRequest() {
     }
 
-    public WorkoutExerciseRequest(Long workoutId, Long exerciseId, String name, int sets, int reps, double weight, String notes, Long userId) {
+    public WorkoutExerciseRequest(Long workoutId, Long exerciseId, String name, LocalDate plannedDate, int sets, int reps, double weight, String notes, Long userId) {
         this.workoutId = workoutId;
         this.exerciseId = exerciseId;
         this.name = name;
+        this.plannedDate = plannedDate;
         this.sets = sets;
         this.reps = reps;
         this.weight = weight;
@@ -46,6 +50,14 @@ public class WorkoutExerciseRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public LocalDate getPlannedDate() {
+        return plannedDate;
+    }
+
+    public void setPlannedDate(LocalDate plannedDate) {
+        this.plannedDate = plannedDate;
     }
 
     public int getSets() {

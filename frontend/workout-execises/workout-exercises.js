@@ -46,7 +46,8 @@ async function loadWorkoutExercises(userId) {
     const available = availRes.ok     ? await availRes.json()     : [];
 
     if (!workouts.length) {
-      root.innerHTML = renderEmpty();
+      root.innerHTML = renderEmpty(available);
+      attachHandlers(userId, workouts, available);
       return;
     }
 
@@ -64,9 +65,11 @@ async function loadWorkoutExercises(userId) {
 
 // ── Render shell ─────────────────────────────────────────────
 function renderPanel(workouts, available) {
+  const defaultDate = workouts[0]?.plannedDate || getWeekStartISO();
   const workoutTabs = workouts.map((w, i) => `
     <button class="we-tab ${i === 0 ? "active" : ""}"
-            data-workout-id="${w.id}">
+            data-workout-id="${w.id}"
+            data-planned-date="${w.plannedDate || ""}">
       <span class="we-tab-date">${formatShortDate(w.plannedDate)}</span>
       <span class="we-tab-desc">${w.description || "Sesión"}</span>
       <span class="we-tab-pill ${w.completed ? "done" : "pending"}">
@@ -98,9 +101,18 @@ function renderPanel(workouts, available) {
 
           <div class="we-form-row">
             <div class="form-group">
+              <label class="form-label">Día</label>
+              <select id="wePlannedDate" name="plannedDate">
+                ${buildWeekDayOptions(defaultDate)}
+              </select>
+            </div>
+          </div>
+
+          <div class="we-form-row">
+            <div class="form-group">
               <label class="form-label">Ejercicio</label>
               ${available.length > 0
-                ? `<select id="weExerciseId" name="exerciseId">${availOptions}</select>`
+                ? `<select id="weExerciseId" name="exerciseId">${available.map(e => `<option value="${e.id}">${e.name || e.exerciseName || "Ejercicio"}</option>`).join("")}</select>`
                 : `<input id="weExerciseName" name="name" placeholder="Nombre del ejercicio" required>`
               }
             </div>
@@ -212,6 +224,9 @@ async function openWorkout(workoutId, userId) {
   // Set hidden workoutId in form
   const weWorkoutId = document.getElementById("weWorkoutId");
   if (weWorkoutId) weWorkoutId.value = workoutId;
+  const plannedDate = document.getElementById("wePlannedDate");
+  const activeTab = document.querySelector(`.we-tab[data-workout-id="${workoutId}"]`);
+  if (plannedDate && activeTab) plannedDate.value = activeTab.dataset.plannedDate || plannedDate.value;
 
   const detail = document.getElementById("weDetail");
   if (!detail) return;
@@ -254,14 +269,20 @@ function attachHandlers(userId, workouts, available) {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const workoutId = document.getElementById("weWorkoutId")?.value;
-    if (!workoutId) return;
+    const selectedDay = document.getElementById("wePlannedDate")?.value || getWeekStartISO();
+    const hiddenWorkoutId = document.getElementById("weWorkoutId")?.value;
+    const selectedWorkout = workouts.find(w => w.plannedDate === selectedDay);
+    const hiddenMatchesSelectedDay = hiddenWorkoutId
+      ? workouts.find(w => String(w.id) === String(hiddenWorkoutId) && w.plannedDate === selectedDay)
+      : null;
+    const workoutId = hiddenMatchesSelectedDay?.id || selectedWorkout?.id || null;
 
     const exerciseIdEl = document.getElementById("weExerciseId");
     const exerciseNameEl = document.getElementById("weExerciseName");
 
     const payload = {
-      workoutId:  Number(workoutId),
+      workoutId:  workoutId ? Number(workoutId) : null,
+      plannedDate: selectedDay,
       exerciseId: exerciseIdEl  ? Number(exerciseIdEl.value) : undefined,
       name:       exerciseNameEl ? exerciseNameEl.value       : undefined,
       sets:       Number(document.getElementById("weSets")?.value   || 3),
@@ -279,8 +300,14 @@ function attachHandlers(userId, workouts, available) {
         await addWorkoutExercise(payload);
       }
       form.reset();
+      const plannedDate = document.getElementById("wePlannedDate");
+      if (plannedDate) plannedDate.value = selectedDay;
       resetFormTitle();
-      await openWorkout(workoutId, userId);
+      if (workoutId) {
+        await openWorkout(workoutId, userId);
+      } else {
+        await loadWorkoutExercises(userId);
+      }
     } catch (err) {
       console.error("[workout-exercises] submit error:", err);
     }
@@ -345,11 +372,61 @@ function renderSkeleton() {
   `;
 }
 
-function renderEmpty() {
+function renderEmpty(available) {
   return `
     <div class="we-wrap">
-      <div class="card" style="padding:32px;text-align:center;">
-        <p style="opacity:0.6;">No hay rutina esta semana. Genera tus objetivos primero.</p>
+      <div class="card" style="padding:32px;">
+        <p style="opacity:0.6; margin-top:0;">No hay rutina esta semana. Puedes crear una sesión personalizada desde aquí.</p>
+
+        <div class="we-add-card card" id="weAddCard" style="margin-top:16px;">
+          <p class="we-add-title">Añadir ejercicio</p>
+          <form id="weAddForm" class="we-form">
+            <input type="hidden" id="weWorkoutId">
+
+            <div class="we-form-row">
+              <div class="form-group">
+                <label class="form-label">Día</label>
+                <select id="wePlannedDate" name="plannedDate">
+                  ${buildWeekDayOptions(getWeekStartISO())}
+                </select>
+              </div>
+            </div>
+
+            <div class="we-form-row">
+              <div class="form-group">
+                <label class="form-label">Ejercicio</label>
+                ${available.length > 0
+                  ? `<select id="weExerciseId" name="exerciseId">${available.map(e => `<option value="${e.id}">${e.name || e.exerciseName || "Ejercicio"}</option>`).join("")}</select>`
+                  : `<input id="weExerciseName" name="name" placeholder="Nombre del ejercicio" required>`
+                }
+              </div>
+            </div>
+
+            <div class="we-form-row three">
+              <div class="form-group">
+                <label class="form-label">Series</label>
+                <input type="number" name="sets" id="weSets" min="1" value="3">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Reps</label>
+                <input type="number" name="reps" id="weReps" min="1" value="10">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Peso (kg)</label>
+                <input type="number" name="weight" id="weWeight" min="0" value="0" step="0.5">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Notas (opcional)</label>
+              <input type="text" name="notes" id="weNotes" placeholder="e.g. Descanso 60s entre series">
+            </div>
+
+            <div class="we-form-actions">
+              <button type="submit">Añadir ejercicio</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   `;
@@ -363,6 +440,21 @@ function renderError(msg) {
 function formatShortDate(iso) {
   if (!iso) return "—";
   return new Date(iso + "T00:00:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
+}
+
+function buildWeekDayOptions(selectedIso) {
+  const start = new Date(`${getWeekStartISO()}T00:00:00`);
+  const options = [];
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + i);
+    const iso = day.toISOString().slice(0, 10);
+    const label = day.toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
+    options.push(`<option value="${iso}" ${iso === selectedIso ? "selected" : ""}>${label}</option>`);
+  }
+
+  return options.join("");
 }
 
 window.loadWorkoutExercises = loadWorkoutExercises;

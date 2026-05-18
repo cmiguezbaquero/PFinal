@@ -108,7 +108,7 @@ public class RoutineService {
             throw new ResponseStatusException(BAD_REQUEST, "User level is required");
         }
 
-        List<Exercise> availableExercises = deduplicateExercisesById(
+        List<Exercise> availableExercises = deduplicateExercisesByKey(
                 exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId)
         );
         if (availableExercises.isEmpty()) {
@@ -177,7 +177,10 @@ public class RoutineService {
                     existing.setWeekStart(newRoutine.getWeekStart());
                     // clear existing workouts and add new ones
                     existing.getWorkouts().clear();
-                    existing.getWorkouts().addAll(newRoutine.getWorkouts());
+                    for (Workout workout : newRoutine.getWorkouts()) {
+                        workout.setRoutine(existing);
+                        existing.getWorkouts().add(workout);
+                    }
                     return repository.save(existing);
                 })
                 .orElseGet(() -> repository.save(newRoutine));
@@ -290,6 +293,7 @@ public class RoutineService {
         // Selección determinista evitando duplicados por ID.
         List<Exercise> selection = new ArrayList<>();
         Set<Long> selectedIds = new LinkedHashSet<>();
+        Set<String> selectedKeys = new LinkedHashSet<>();
         List<Exercise> rankedAll = rankExercises(availableExercises, goalType, level);
 
         // 1) Intento por grupos: recorro rankedAll y cojo los que concuerden con cada grupo
@@ -297,13 +301,16 @@ public class RoutineService {
         for (String group : templateGroups) {
             for (Exercise candidate : rankedAll) {
                 Long id = candidate.getId();
+                String key = exerciseKey(candidate);
                 if (id == null) continue;
                 if (selectedIds.contains(id)) continue;  // Avoid duplicates in current workout
+                if (selectedKeys.contains(key)) continue;
                 if (!matchesGroup(candidate.getMuscleGroup(), group)) continue;
                 if (weeklyUsedExercises != null && weeklyUsedExercises.contains(id)) continue;
 
                 selection.add(candidate);
                 selectedIds.add(id);
+                selectedKeys.add(key);
                 if (weeklyUsedExercises != null) weeklyUsedExercises.add(id);
 
                 if (selection.size() >= targetCount) break outer;
@@ -314,12 +321,15 @@ public class RoutineService {
         for (Exercise candidate : rankedAll) {
             if (selection.size() >= targetCount) break;
             Long id = candidate.getId();
+            String key = exerciseKey(candidate);
             if (id == null) continue;
             if (selectedIds.contains(id)) continue;  // Avoid duplicates in current workout
+            if (selectedKeys.contains(key)) continue;
             if (weeklyUsedExercises != null && weeklyUsedExercises.contains(id)) continue;
 
             selection.add(candidate);
             selectedIds.add(id);
+            selectedKeys.add(key);
             if (weeklyUsedExercises != null) weeklyUsedExercises.add(id);
         }
 
@@ -328,29 +338,33 @@ public class RoutineService {
             for (Exercise candidate : rankedAll) {
                 if (selection.size() >= targetCount) break;
                 Long id = candidate.getId();
+                String key = exerciseKey(candidate);
                 if (id == null) continue;
                 if (selectedIds.contains(id)) continue;  // Never duplicate in same workout
+                if (selectedKeys.contains(key)) continue;
                 selection.add(candidate);
                 selectedIds.add(id);
+                selectedKeys.add(key);
             }
         }
 
         return selection;
     }
 
-    private List<Exercise> deduplicateExercisesById(List<Exercise> exercises) {
+    private List<Exercise> deduplicateExercisesByKey(List<Exercise> exercises) {
         if (exercises == null || exercises.isEmpty()) {
             return List.of();
         }
 
         List<Exercise> deduplicated = new ArrayList<>();
-        Set<Long> seenIds = new LinkedHashSet<>();
+        Set<String> seenKeys = new LinkedHashSet<>();
 
         for (Exercise exercise : exercises) {
-            if (exercise == null || exercise.getId() == null) {
+            if (exercise == null) {
                 continue;
             }
-            if (seenIds.add(exercise.getId())) {
+            String key = exerciseKey(exercise);
+            if (seenKeys.add(key)) {
                 deduplicated.add(exercise);
             }
         }
@@ -414,6 +428,17 @@ public class RoutineService {
             case "CARDIO", "AEROBICO", "AERÓBICO" -> "CARDIO";
             default -> muscleGroup.trim().toUpperCase();
         };
+    }
+
+    private String exerciseKey(Exercise exercise) {
+        if (exercise == null) {
+            return "";
+        }
+        String name = exercise.getName() == null ? "" : exercise.getName().trim().toLowerCase();
+        if (!name.isEmpty()) {
+            return name;
+        }
+        return exercise.getId() == null ? "" : "id:" + exercise.getId();
     }
 
 }
