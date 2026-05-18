@@ -1,5 +1,5 @@
 import { clearCurrentUser, getCurrentUser } from "../shared/session.js";
-import { getWeekStartISO } from "../shared/date.js";
+import { getWeekStartISO, toLocalISODate } from "../shared/date.js";
 import { getWeeklyWorkouts, toggleWorkoutCompletion, addWorkoutExercise } from "../shared/api.js";
 
 /* =========================
@@ -151,13 +151,13 @@ function renderWeekGrid() {
   if (!grid) return;
 
   grid.innerHTML = "";
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = toLocalISODate(new Date());
   const start = new Date(`${getWeekStartISO()}T00:00:00`);
 
   for (let i = 0; i < 7; i++) {
     const day = new Date(start);
     day.setDate(start.getDate() + i);
-    const iso = day.toISOString().slice(0, 10);
+    const iso = toLocalISODate(day);
 
     const tile = document.createElement("button");
     tile.classList.add("day-tile");
@@ -320,7 +320,7 @@ function populateAddExerciseDays() {
   for (let i = 0; i < 7; i++) {
     const day = new Date(start);
     day.setDate(start.getDate() + i);
-    const iso = day.toISOString().slice(0, 10);
+    const iso = toLocalISODate(day);
     const opt = document.createElement("option");
     opt.value    = iso;
     opt.innerText = day.toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
@@ -406,7 +406,7 @@ function renderDashboardSummary(workouts) {
     return;
   }
 
-  const todayIso    = new Date().toISOString().slice(0, 10);
+  const todayIso    = toLocalISODate(new Date());
   const todayWorkout = workouts.find(w => w.plannedDate === todayIso) ?? workouts[0];
 
   title.innerText       = "Today's Workout";

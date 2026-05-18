@@ -12,7 +12,7 @@
  */
 
 import { getCurrentUser }        from "../shared/session.js";
-import { getWeekStartISO }       from "../shared/date.js";
+import { getWeekStartISO, toLocalISODate } from "../shared/date.js";
 import {
   getWeeklyWorkouts,
   getWorkoutExercises,
@@ -449,7 +449,7 @@ function buildWeekDayOptions(selectedIso) {
   for (let i = 0; i < 7; i++) {
     const day = new Date(start);
     day.setDate(start.getDate() + i);
-    const iso = day.toISOString().slice(0, 10);
+    const iso = toLocalISODate(day);
     const label = day.toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
     options.push(`<option value="${iso}" ${iso === selectedIso ? "selected" : ""}>${label}</option>`);
   }

@@ -15,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Locale;
 
 @Service
 public class RecommendationService {
@@ -37,8 +38,7 @@ public class RecommendationService {
             return List.of();
         }
 
-        // Deduplicate by ID first
-        allExercises = deduplicateExercisesById(allExercises);
+        allExercises = deduplicateExercisesByName(allExercises);
 
         if (workouts.isEmpty()) {
             return allExercises.stream()
@@ -64,24 +64,32 @@ public class RecommendationService {
                 .toList();
     }
 
-    private List<Exercise> deduplicateExercisesById(List<Exercise> exercises) {
+    private List<Exercise> deduplicateExercisesByName(List<Exercise> exercises) {
         if (exercises == null || exercises.isEmpty()) {
             return List.of();
         }
 
         List<Exercise> deduplicated = new ArrayList<>();
-        Set<Long> seenIds = new LinkedHashSet<>();
+        Set<String> seenNames = new LinkedHashSet<>();
 
         for (Exercise exercise : exercises) {
-            if (exercise == null || exercise.getId() == null) {
+            if (exercise == null) {
                 continue;
             }
-            if (seenIds.add(exercise.getId())) {
+            String key = normalizeName(exercise.getName());
+            if (key.isEmpty()) {
+                key = exercise.getId() == null ? "" : "id:" + exercise.getId();
+            }
+            if (seenNames.add(key)) {
                 deduplicated.add(exercise);
             }
         }
 
         return deduplicated;
+    }
+
+    private String normalizeName(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 }
 

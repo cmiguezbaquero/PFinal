@@ -38,7 +38,7 @@ async function loadRecommendations(userId) {
     const recommendations = recRes.ok   ? await recRes.json()   : [];
     const available       = availRes.ok ? await availRes.json() : [];
 
-    root.innerHTML = renderRecommendations(recommendations, available);
+    root.innerHTML = renderRecommendations(deduplicateExercises(recommendations), deduplicateExercises(available));
     attachHandlers(userId);
   } catch (err) {
     console.error("[recommendations] fetch error:", err);
@@ -133,6 +133,17 @@ function renderRecCard(ex, isRec) {
   `;
 }
 
+function deduplicateExercises(exercises) {
+  const seen = new Set();
+  return (Array.isArray(exercises) ? exercises : []).filter(ex => {
+    const name = normalizeKey(ex?.name || ex?.exerciseName || "");
+    const key = name || String(ex?.id ?? "");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function renderSkeleton() {
   const cards = Array(4).fill(`
     <div class="rec-card card skeleton-card">
@@ -166,6 +177,10 @@ async function refreshRecommendations() {
   const user = getCurrentUser();
   if (!user) return;
   await loadRecommendations(user.id);
+}
+
+function normalizeKey(value) {
+  return String(value || "").trim().toLowerCase();
 }
 
 window.refreshRecommendations = refreshRecommendations;
