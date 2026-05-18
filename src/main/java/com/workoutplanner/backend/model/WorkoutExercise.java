@@ -27,16 +27,19 @@ public class WorkoutExercise {
 
     private double weight;
 
+    private String notes;
+
     public WorkoutExercise() {
     }
 
-    public WorkoutExercise(Long id, Workout workout, Exercise exercise, int sets, int reps, double weight) {
+    public WorkoutExercise(Long id, Workout workout, Exercise exercise, int sets, int reps, double weight, String notes) {
         this.id = id;
         this.workout = workout;
         this.exercise = exercise;
         this.sets = sets;
         this.reps = reps;
         this.weight = weight;
+        this.notes = notes;
     }
 
     public Long getId() {
@@ -85,5 +88,13 @@ public class WorkoutExercise {
 
     public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

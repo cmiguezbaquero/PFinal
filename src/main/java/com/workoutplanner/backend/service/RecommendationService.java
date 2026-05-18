@@ -8,10 +8,13 @@ import com.workoutplanner.backend.repository.WorkoutRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class RecommendationService {
@@ -33,6 +36,9 @@ public class RecommendationService {
         if (allExercises.isEmpty()) {
             return List.of();
         }
+
+        // Deduplicate by ID first
+        allExercises = deduplicateExercisesById(allExercises);
 
         if (workouts.isEmpty()) {
             return allExercises.stream()
@@ -56,6 +62,26 @@ public class RecommendationService {
                                 exercise.getMuscleGroup() == null ? "" : exercise.getMuscleGroup().toLowerCase(), 0))
                         .thenComparing(Exercise::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
+    }
+
+    private List<Exercise> deduplicateExercisesById(List<Exercise> exercises) {
+        if (exercises == null || exercises.isEmpty()) {
+            return List.of();
+        }
+
+        List<Exercise> deduplicated = new ArrayList<>();
+        Set<Long> seenIds = new LinkedHashSet<>();
+
+        for (Exercise exercise : exercises) {
+            if (exercise == null || exercise.getId() == null) {
+                continue;
+            }
+            if (seenIds.add(exercise.getId())) {
+                deduplicated.add(exercise);
+            }
+        }
+
+        return deduplicated;
     }
 }
 

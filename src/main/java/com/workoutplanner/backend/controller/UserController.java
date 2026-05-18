@@ -6,6 +6,7 @@ import com.workoutplanner.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -45,6 +46,11 @@ public class UserController {
     @PutMapping("/{id}/goals")
     public User updateGoals(@PathVariable Long id, @RequestBody UserGoalsRequest request) {
         return userService.updateGoals(id, request);
+    }
+
+    @PutMapping("/{id}/password")
+    public User changePassword(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        return userService.changePassword(id, request.get("currentPassword"), request.get("newPassword"));
     }
 
     @DeleteMapping("/{id}")

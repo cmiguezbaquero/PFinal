@@ -1,6 +1,6 @@
 import { clearCurrentUser, getCurrentUser } from "../shared/session.js";
 import { getWeekStartISO } from "../shared/date.js";
-import { getWeeklyWorkouts, toggleWorkoutCompletion, createExercise } from "../shared/api.js";
+import { getWeeklyWorkouts, toggleWorkoutCompletion, createExercise, addWorkoutExercise } from "../shared/api.js";
 
 /* =========================
    INIT

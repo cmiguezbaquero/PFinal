@@ -110,6 +110,24 @@ public class UserService {
         return savedUser;
     }
 
+    public User changePassword(Long id, String currentPassword, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Current password is required");
+        }
+
+        if (!matchesPassword(currentPassword, user.getPassword())) {
+            throw new ResponseStatusException(UNAUTHORIZED, "Current password is incorrect");
+        }
+
+        validatePassword(newPassword);
+
+        user.setPassword(hashPassword(newPassword));
+        return userRepository.save(user);
+    }
+
     public void deleteUser(Long id) {
         User user = getUserById(id);
         userRepository.delete(user);

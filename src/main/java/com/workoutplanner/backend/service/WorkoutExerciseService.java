@@ -32,6 +32,10 @@ public class WorkoutExerciseService {
         return workoutExerciseRepository.findAll();
     }
 
+    public List<WorkoutExercise> getByWorkoutId(Long workoutId) {
+        return workoutExerciseRepository.findByWorkoutId(workoutId);
+    }
+
     public WorkoutExercise getById(Long id) {
         return workoutExerciseRepository.findById(id)
                 .orElseThrow(()-> new ResponseStatusException(NOT_FOUND, "WorkoutExercise not found"));
