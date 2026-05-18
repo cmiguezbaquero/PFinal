@@ -1,11 +1,5 @@
-import { API } from "./shared/api.js";
+import { login, register, isValidRegistrationEmail } from "./shared/auth.js";
 import { setCurrentUser, getCurrentUser } from "./shared/session.js";
-
-const authAPI = API.auth;
-
-function isValidRegistrationEmail(email) {
-  return typeof email === "string" && email.includes("@");
-}
 
 /* =========================
    AUTO CHECK (SOLO REDIRECT SI YA LOGUEADO)
@@ -37,14 +31,7 @@ async function loginUser() {
   }
 
   try {
-    const res = await fetch(`${authAPI}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: emailInput.value,
-        password: passwordInput.value
-      })
-    });
+    const res = await login(emailInput.value, passwordInput.value);
 
     if (!res.ok) {
       alert("Login incorrecto");
@@ -85,15 +72,11 @@ async function createUser() {
   }
 
   try {
-    const res = await fetch(`${authAPI}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value
-      })
-    });
+    const res = await register(
+      nameInput.value.trim(),
+      emailInput.value.trim(),
+      passwordInput.value
+    );
 
     if (!res.ok) {
       alert("Error registro");

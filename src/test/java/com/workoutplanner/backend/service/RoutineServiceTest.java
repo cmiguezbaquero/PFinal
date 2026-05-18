@@ -19,7 +19,7 @@ public class RoutineServiceTest {
         List<Exercise> available = new ArrayList<>();
         for (long i = 1; i <= 8; i++) {
             Exercise e = new Exercise();
-            e.setId(i);
+            e.setId(i == 4 ? 2L : i); // duplicado de origen para validar la deduplicación
             e.setName("Ex " + i);
             e.setMuscleGroup(i % 2 == 0 ? "PIERNAS" : "PECHO");
             available.add(e);

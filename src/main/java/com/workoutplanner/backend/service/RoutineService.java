@@ -106,8 +106,9 @@ public class RoutineService {
             throw new ResponseStatusException(BAD_REQUEST, "User level is required");
         }
 
-        List<Exercise> availableExercises =
-                exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId);
+        List<Exercise> availableExercises = deduplicateExercisesById(
+                exerciseRepository.findByOwnerIdIsNullOrSharedTrueOrOwnerId(userId)
+        );
         if (availableExercises.isEmpty()) {
             throw new ResponseStatusException(BAD_REQUEST, "No exercises available");
         }
@@ -273,21 +274,18 @@ public class RoutineService {
                                                      int targetCount) {
         // Selección determinista evitando duplicados por ID.
         List<Exercise> selection = new ArrayList<>();
-        // Mantener IDs seleccionados para garantizar unicidad
         Set<Long> selectedIds = new LinkedHashSet<>();
-
-        // Rankear todos los candidatos una vez
         List<Exercise> rankedAll = rankExercises(availableExercises, goalType, level);
 
         // 1) Intento por grupos: recorro rankedAll y cojo los que concuerden con cada grupo
         outer:
         for (String group : templateGroups) {
             for (Exercise candidate : rankedAll) {
-                if (!matchesGroup(candidate.getMuscleGroup(), group)) continue;
                 Long id = candidate.getId();
-                if (id == null) continue; // defensivo
-                if (selectedIds.contains(id)) continue; // ya seleccionado en este workout
-                if (weeklyUsedExercises != null && weeklyUsedExercises.contains(id)) continue; // ya usado esta semana
+                if (id == null) continue;
+                if (selectedIds.contains(id)) continue;
+                if (!matchesGroup(candidate.getMuscleGroup(), group)) continue;
+                if (weeklyUsedExercises != null && weeklyUsedExercises.contains(id)) continue;
 
                 selection.add(candidate);
                 selectedIds.add(id);
@@ -297,7 +295,6 @@ public class RoutineService {
             }
         }
 
-        // 2) Rellenar con el resto de rankedAll (evitando duplicados y weeklyUsed si aplicable)
         for (Exercise candidate : rankedAll) {
             if (selection.size() >= targetCount) break;
             Long id = candidate.getId();
@@ -310,7 +307,6 @@ public class RoutineService {
             if (weeklyUsedExercises != null) weeklyUsedExercises.add(id);
         }
 
-        // 3) Si todavía no hay suficientes, permitir ignorar weeklyUsedExercises para rellenar
         if (selection.size() < targetCount) {
             for (Exercise candidate : rankedAll) {
                 if (selection.size() >= targetCount) break;
@@ -323,6 +319,26 @@ public class RoutineService {
         }
 
         return selection;
+    }
+
+    private List<Exercise> deduplicateExercisesById(List<Exercise> exercises) {
+        if (exercises == null || exercises.isEmpty()) {
+            return List.of();
+        }
+
+        List<Exercise> deduplicated = new ArrayList<>();
+        Set<Long> seenIds = new LinkedHashSet<>();
+
+        for (Exercise exercise : exercises) {
+            if (exercise == null || exercise.getId() == null) {
+                continue;
+            }
+            if (seenIds.add(exercise.getId())) {
+                deduplicated.add(exercise);
+            }
+        }
+
+        return deduplicated;
     }
 
 

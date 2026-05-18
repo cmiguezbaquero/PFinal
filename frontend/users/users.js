@@ -1,12 +1,8 @@
+import { login, register, isValidRegistrationEmail } from "../shared/auth.js";
 import { API } from "../shared/api.js";
 import { getCurrentUser, setCurrentUser, clearCurrentUser } from "../shared/session.js";
 
 const usersAPI = API.users;
-const authAPI = API.auth;
-
-function isValidRegistrationEmail(email) {
-  return typeof email === "string" && email.includes("@");
-}
 
 /* =========================
    INIT
@@ -49,15 +45,11 @@ async function createUser(event) {
   }
 
   try {
-    const res = await fetch(`${authAPI}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value
-      })
-    });
+    const res = await register(
+      nameInput.value.trim(),
+      emailInput.value.trim(),
+      passwordInput.value
+    );
 
     if (!res.ok) {
       alert("Error al registrarse");
@@ -81,14 +73,10 @@ async function loginUser(event) {
   if (event) event.preventDefault();
 
   try {
-    const res = await fetch(`${authAPI}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: document.getElementById("loginEmail").value,
-        password: document.getElementById("loginPassword").value
-      })
-    });
+    const res = await login(
+      document.getElementById("loginEmail").value,
+      document.getElementById("loginPassword").value
+    );
 
     if (!res.ok) {
       alert("Email o contraseña incorrectos");
