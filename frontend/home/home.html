@@ -46,12 +46,17 @@
         <span class="nav-label">Dashboard</span>
       </button>
 
-      <button class="nav-btn" onclick="showSection('workouts')" data-section="workouts">
-        <span class="nav-icon">⊞</span>
-        <span class="nav-label">Workouts</span>
-      </button>
+       <button class="nav-btn" onclick="showSection('workouts')" data-section="workouts">
+         <span class="nav-icon">⊞</span>
+         <span class="nav-label">Workouts</span>
+       </button>
 
        <button class="nav-btn" onclick="showSection('workout-exercises')" data-section="workout-exercises">
+         <span class="nav-icon">🏋</span>
+         <span class="nav-label">Ejercicios</span>
+       </button>
+
+       <button class="nav-btn" onclick="showSection('recommendations')" data-section="recommendations">
          <span class="nav-icon">🏋</span>
          <span class="nav-label">Ejercicios</span>
        </button>
@@ -82,14 +87,41 @@
       <p class="progress-stat"><strong id="sessionsDone">0</strong> sessions done</p>
     </div>
 
-    <div class="sidebar-actions">
-      <button class="add-btn" onclick="showAddExercise()">
-        <span>＋</span> Add exercise
-      </button>
-      <button class="logout-btn" onclick="logout()">
-        <span>↪</span> Logout
-      </button>
-    </div>
+     <div class="sidebar-actions">
+       <button class="add-btn" onclick="showAddExercise()">
+         <span>＋</span> Add exercise
+       </button>
+       <button class="settings-btn" onclick="togglePreferencesPanel()">
+         <span>⚙</span> <span class="hidden-mobile">Settings</span>
+       </button>
+       <button class="logout-btn" onclick="logout()">
+         <span>↪</span> Logout
+       </button>
+     </div>
+
+     <!-- Preferences Panel -->
+     <div id="preferencesPanel" class="preferences-panel hidden">
+       <div class="preferences-header">
+         <h3>Preferencias</h3>
+         <button class="close-btn" onclick="togglePreferencesPanel()">✕</button>
+       </div>
+
+       <div class="preferences-group">
+         <label>Tema</label>
+         <div class="toggle-group">
+           <button class="toggle-btn" data-theme="dark" onclick="window.preferences.set({theme: 'dark'})">🌙 Oscuro</button>
+           <button class="toggle-btn" data-theme="light" onclick="window.preferences.set({theme: 'light'})">☀️ Claro</button>
+         </div>
+       </div>
+
+       <div class="preferences-group">
+         <label>Vista</label>
+         <div class="toggle-group">
+           <button class="toggle-btn" data-view="calendar" onclick="window.preferences.set({viewMode: 'calendar'})">📅 Calendario</button>
+           <button class="toggle-btn" data-view="horizontal" onclick="window.preferences.set({viewMode: 'horizontal'})">➡️ Horizontal</button>
+         </div>
+       </div>
+     </div>
 
   </aside>
 
@@ -138,18 +170,29 @@
 
     </section>
 
-    <!-- ── WORKOUTS ── -->
-    <section id="workouts" class="section">
-      <div class="page-header">
-        <div>
-          <h2>Your Routine</h2>
-          <p class="page-sub">Drag to reorder · click to complete</p>
-        </div>
-      </div>
-      <div class="grid" id="workoutList"></div>
-    </section>
+     <!-- ── WORKOUTS ── -->
+     <section id="workouts" class="section">
+       <div class="page-header">
+         <div>
+           <h2>Your Routine</h2>
+           <p class="page-sub">Drag to reorder · click to complete</p>
+         </div>
+       </div>
+       <div class="grid" id="workoutList"></div>
+     </section>
 
      <!-- ── WORKOUT EXERCISES ── -->
+     <section id="workout-exercises" class="section">
+       <div class="page-header">
+         <div>
+           <h2>Ejercicios por sesión</h2>
+           <p class="page-sub">Gestiona series, repeticiones y peso de cada ejercicio</p>
+         </div>
+       </div>
+       <div id="workoutExercisesRoot"></div>
+     </section>
+
+     <!-- ── RECOMMENDATIONS ── -->
      <section id="workout-exercises" class="section">
        <div class="page-header">
          <div>
@@ -267,7 +310,7 @@
 <script type="module" src="home.js"></script>
 
 <!-- ── Feature modules — registran window._load* para lazy loading ── -->
-<script type="module" src="../recommendations/recommendations.js">
+<script type="module" src="../recommendations/recommendations.js"></script>
 <script type="module" src="../workout-execises/workout-exercises.js"></script>
 <script type="module" src="../profile/profile.js"></script>
 

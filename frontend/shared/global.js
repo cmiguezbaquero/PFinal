@@ -57,3 +57,26 @@ function toggleSection(bodyId) {
 function refreshRecommendations() {
   if (window._loadRecommendations) window._loadRecommendations();
 }
+
+/* ── Preferences panel ──────────────────────────────────────── */
+function togglePreferencesPanel() {
+  const panel = document.getElementById("preferencesPanel");
+  if (!panel) return;
+  panel.classList.toggle("hidden");
+  updatePreferencesUI();
+}
+
+function updatePreferencesUI() {
+  const prefs = window.preferences?.get?.();
+  if (!prefs) return;
+
+  // Actualizar botones de tema
+  document.querySelectorAll('[data-theme]').forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.theme === prefs.theme);
+  });
+
+  // Actualizar botones de vista
+  document.querySelectorAll('[data-view]').forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.view === prefs.viewMode);
+  });
+}

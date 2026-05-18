@@ -1235,26 +1235,209 @@
 }
 
 /* =========================================================
-   RESPONSIVE
+   SETTINGS BUTTON & PREFERENCES PANEL
 ========================================================= */
 
-@media (max-width: 900px) {
-
-  .compliance-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .weekly-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .session-overview {
-    grid-template-columns: 1fr;
-  }
+.settings-btn {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
+  color: var(--h-text) !important;
+  animation: none !important;
+  box-shadow: none !important;
+  transition: all 180ms ease;
+}
+.settings-btn:hover {
+  background: rgba(255,255,255,0.08) !important;
+  transform: translateY(-1px);
 }
 
+.hidden-mobile {
+  display: inline;
+}
 
+.preferences-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  background: rgba(20,10,40,0.98);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--h-border);
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: slideInRight 0.3s var(--ease-out) both;
+  box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.preferences-panel.hidden {
+  display: none !important;
+}
+
+.preferences-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 16px;
+}
+
+.preferences-header h3 {
+  font-family: 'Clash Display', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--h-text);
+}
+
+.preferences-header .close-btn {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  font-size: 12px !important;
+  animation: none !important;
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--h-muted) !important;
+  border-radius: 6px !important;
+}
+
+.preferences-group {
+  margin-bottom: 20px;
+}
+
+.preferences-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--h-muted);
+  margin-bottom: 10px;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  color: var(--h-muted) !important;
+  animation: none !important;
+  box-shadow: none !important;
+  transition: all 180ms ease;
+  cursor: pointer;
+}
+
+.toggle-btn:hover {
+  background: rgba(255,255,255,0.08) !important;
+  color: var(--h-text) !important;
+}
+
+.toggle-btn.active {
+  background: var(--h-grad-soft) !important;
+  border-color: rgba(204,111,255,0.30) !important;
+  color: var(--h-text) !important;
+  box-shadow: 0 4px 12px rgba(204,111,255,0.12) !important;
+}
+
+/* =========================================================
+   LIGHT THEME (Optional - si se selecciona tema claro)
+========================================================= */
+
+html.light-theme {
+  --h-bg: #f8f9fa;
+  --h-surface: rgba(255,255,255,0.95);
+  --h-border: rgba(0,0,0,0.08);
+  --h-border-hi: rgba(0,0,0,0.15);
+
+  --h-text: #1a1a2e;
+  --h-muted: rgba(26,26,46,0.60);
+  --h-faint: rgba(26,26,46,0.35);
+
+  --h-grad: linear-gradient(135deg, #cc6fff 0%, #818cf8 45%, #fb7bb8 100%);
+  --h-grad-soft: linear-gradient(135deg, rgba(204,111,255,0.14), rgba(129,140,248,0.10), rgba(251,123,184,0.12));
+}
+
+html.light-theme .left-panel {
+  background: rgba(255,255,255,0.95);
+  border-right-color: rgba(0,0,0,0.08);
+}
+
+html.light-theme .day-tile {
+  background: white !important;
+  border-color: rgba(0,0,0,0.08);
+}
+
+html.light-theme .card {
+  background: white !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+html.light-theme input,
+html.light-theme select {
+  background: rgba(0,0,0,0.03) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  color: #1a1a2e !important;
+}
+
+/* =========================================================
+   VIEW MODES (Horizontal vs Calendar)
+========================================================= */
+
+html.view-horizontal .week-grid {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+html.view-horizontal .day-tile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  min-height: auto;
+}
+
+html.view-horizontal .day-tile-header {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+html.view-horizontal .day-tile-exercises {
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  padding-left: 16px;
+}
+
+html.view-horizontal .day-tile-ex {
+  flex-shrink: 0;
+}

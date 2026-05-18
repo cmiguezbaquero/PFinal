@@ -1,11 +1,15 @@
 import { clearCurrentUser, getCurrentUser } from "../shared/session.js";
 import { getWeekStartISO, toLocalISODate } from "../shared/date.js";
 import { getWeeklyWorkouts, toggleWorkoutCompletion, addWorkoutExercise } from "../shared/api.js";
+import { initPreferences } from "../shared/preferences.js";
 
 /* =========================
    INIT
 ========================= */
 document.addEventListener("DOMContentLoaded", async () => {
+  // Inicializar preferencias
+  initPreferences();
+
   const user = getCurrentUser();
 
   if (!user) {
