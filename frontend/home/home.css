@@ -361,8 +361,12 @@
 
 .week-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  /* prevent tiles from growing excessively on very wide screens */
+  grid-template-columns: repeat(7, minmax(160px, 1fr));
   gap: 12px;
+  max-width: calc(7 * 220px + 6 * 12px); /* prefer a comfortable max width for 7 tiles */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ── Day tile ──────────────────────────────────────────────── */
@@ -394,12 +398,15 @@
 .day-tile::before {
   content: '';
   position: absolute;
-  top: 0; left: 15%; right: 15%;
+  /* subtle top divider aligned with tile padding to avoid visual offset */
+  top: 8px;
+  left: 10%;
+  right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(204,111,255,0.25), transparent);
+  background: linear-gradient(90deg, transparent, rgba(204,111,255,0.18), transparent);
   border-radius: 999px;
   opacity: 0;
-  transition: opacity 200ms ease;
+  transition: opacity 160ms ease, background 160ms ease;
 }
 .day-tile:hover::before { opacity: 1; }
 
@@ -430,6 +437,9 @@
   margin-bottom: 10px;
 }
 
+/* Keep header content away from the pseudo divider and ensure consistent alignment */
+.day-tile .day-tile-header { padding-top: 4px; }
+
 .day-tile-weekday {
   font-size: 10px;
   font-weight: 700;
@@ -453,6 +463,7 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  align-items: flex-start;
 }
 
 .day-tile-ex {
@@ -462,11 +473,14 @@
   font-size: 11px;
   color: var(--h-muted);
   line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* keep single line */
+  overflow: hidden;    /* hide overflow */
+  text-overflow: ellipsis; /* show ... for long text */
   max-width: 100%;
   min-width: 0;
+  flex: 1 1 auto; /* allow element to grow/shrink inside tile */
+  padding-left: 4px;   /* leave space so the dot marker doesn't overlap text */
+  box-sizing: border-box;
 }
 .day-tile-ex::before {
   content: '';
@@ -475,6 +489,15 @@
   background: var(--h-p1);
   flex-shrink: 0;
   opacity: 0.7;
+}
+
+/* Make sure the exercises container doesn't push content off the left edge on small tiles */
+.day-tile-exercises { padding-left: 6px; }
+
+/* For very small tiles, allow the preview to shrink but keep ellipsis readable */
+@media (max-width: 600px) {
+  .day-tile-ex { font-size: 12px; padding-left: 2px; }
+  .day-tile { min-height: 120px; }
 }
 
 .day-tile-more {
